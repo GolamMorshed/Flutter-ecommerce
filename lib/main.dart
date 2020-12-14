@@ -95,7 +95,7 @@ class _MyPageState extends State<MyHomePage> {
     );
   }
 }
-
+//ITEM CLASS
 class Item {
   final String ItemCode;
   final String UserMememberNo;
@@ -106,17 +106,43 @@ class Item {
   final String Image3;
   final String Image4;
 
+
+
   Item(this.ItemCode, this.UserMememberNo, this.Description,this.Image,this.Image1,this.Image2,this.Image3,this.Image4);
 }
+//VARIATION CLASS
+class Variation {
+  final Size;
+  final Price;
 
-class DetailPage extends StatelessWidget {
+  Variation(this.Size, this.Price);
+}
+
+
+class DetailPage extends StatefulWidget {
   final Item item;
   DetailPage(this.item);
+
+  @override
+  _DetailPageState createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
+  int _counter = 1;
+  void _incrementCounter() {
+    _counter++;
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    String numberOfItem;
+
     return Scaffold(
       appBar: AppBar(
-        title:Text(item.Description),
+        title:Text(widget.item.Description),
+
+
       ),
 
       body: Container(
@@ -127,7 +153,7 @@ class DetailPage extends StatelessWidget {
               Card(
                 child: Column(
                   children: <Widget>[
-                    Image.network("https://thegreen.studio/ecommerce/default/upload/"+item.Image,
+                    Image.network("https://thegreen.studio/ecommerce/default/upload/"+widget.item.Image,
                       width: 450.0,
                       height: 400.0,
                       fit: BoxFit.cover,
@@ -142,22 +168,22 @@ class DetailPage extends StatelessWidget {
                     Card(
                       child: Row(
                         children: <Widget>[
-                          Image.network("https://thegreen.studio/ecommerce/default/upload/"+item.Image1,
+                          Image.network("https://thegreen.studio/ecommerce/default/upload/"+widget.item.Image1,
                             width: 100.0,
                             height: 100.0,
                             fit: BoxFit.cover,
                           ),
-                          Image.network("https://thegreen.studio/ecommerce/default/upload/"+item.Image2,
+                          Image.network("https://thegreen.studio/ecommerce/default/upload/"+widget.item.Image2,
                             width: 100.0,
                             height: 100.0,
                             fit: BoxFit.cover,
                           ),
-                          Image.network("https://thegreen.studio/ecommerce/default/upload/"+item.Image3,
+                          Image.network("https://thegreen.studio/ecommerce/default/upload/"+widget.item.Image3,
                             width: 100.0,
                             height: 100.0,
                             fit: BoxFit.cover,
                           ),
-                          Image.network("https://thegreen.studio/ecommerce/default/upload/"+item.Image4,
+                          Image.network("https://thegreen.studio/ecommerce/default/upload/"+widget.item.Image4,
                             width: 100.0,
                             height: 100.0,
                             fit: BoxFit.cover,
@@ -173,10 +199,11 @@ class DetailPage extends StatelessWidget {
                 child: SizedBox(
                   child: Row(
                     children: <Widget>[
-                      Text(item.UserMememberNo,style: TextStyle(
+                      Text(widget.item.UserMememberNo,style: TextStyle(
                         fontSize:30,
 
                       ),),
+
                     ],
                   ),
 
@@ -199,7 +226,7 @@ class DetailPage extends StatelessWidget {
                 child: SizedBox(
                   child: Row(
                     children: <Widget>[
-                      Text(item.Description,style: TextStyle(
+                      Text(widget.item.Description,style: TextStyle(
                         fontSize:20,
 
                       ),),
@@ -216,6 +243,15 @@ class DetailPage extends StatelessWidget {
                       width: 40,
                         height: 32,
                         child:OutlineButton(
+                          onPressed: (){
+                            setState(() {
+                              if(_counter <=0){
+                                _counter = 1;
+                              }
+                                _counter--;
+                            });
+
+                          },
                           padding: EdgeInsets.zero,
                           child: Icon(Icons.remove),
                           shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
@@ -226,12 +262,19 @@ class DetailPage extends StatelessWidget {
                         width: 40,
                         height: 32,
                         //padding:const EdgeInsets.symmetric(horizontal: kNoDefaultValue / 2),
-                        child:Text("01", style: Theme.of(context).textTheme.headline6,),
+                        child:Text("$_counter", style: Theme.of(context).textTheme.headline6,),
                     ),
                     SizedBox(
                         width: 40,
                         height: 32,
+
                         child:OutlineButton(
+                          onPressed:(){
+                            setState(() {
+                              _counter++;
+                            });
+
+                    },
                           padding: EdgeInsets.zero,
                           child: Icon(Icons.add),
                           shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
@@ -283,5 +326,5 @@ class DetailPage extends StatelessWidget {
     );
 
   }
-
 }
+
