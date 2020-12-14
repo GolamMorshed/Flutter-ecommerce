@@ -39,7 +39,7 @@ class _MyPageState extends State<MyHomePage> {
       Item item = Item(i["ItemCode"],i["UserMememberNo"],i["Description"],i["Image"],i["Image1"],i["Image2"],i["Image3"],i["Image4"]);
       items.add(item);
     }
-    print(items.length);
+    print(items);
     return items;
   }
 
@@ -111,6 +111,7 @@ class Item {
 
 class DetailPage extends StatelessWidget {
   final Item item;
+  int count = 1;
   DetailPage(this.item);
   @override
   Widget build(BuildContext context) {
@@ -216,6 +217,9 @@ class DetailPage extends StatelessWidget {
                       width: 40,
                         height: 32,
                         child:OutlineButton(
+                          onPressed: (){
+                            count--;
+                          },
                           padding: EdgeInsets.zero,
                           child: Icon(Icons.remove),
                           shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
@@ -226,12 +230,15 @@ class DetailPage extends StatelessWidget {
                         width: 40,
                         height: 32,
                         //padding:const EdgeInsets.symmetric(horizontal: kNoDefaultValue / 2),
-                        child:Text("01", style: Theme.of(context).textTheme.headline6,),
+                        child:Text(_count.toString(), style: Theme.of(context).textTheme.headline6),
                     ),
                     SizedBox(
                         width: 40,
                         height: 32,
                         child:OutlineButton(
+                          onPressed: (){
+                            count++;
+                          },
                           padding: EdgeInsets.zero,
                           child: Icon(Icons.add),
                           shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
