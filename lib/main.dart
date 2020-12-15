@@ -1,13 +1,11 @@
 
-
-
-
-
+import 'package:ecommerce/main_drawer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import './main_drawer.dart';
 
 void main() => runApp(new MyApp());
 
@@ -16,10 +14,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        title:"All product list",
         theme:new ThemeData(
           primarySwatch: Colors.blue,
         ),
+
         home: new MyHomePage(title:"All product list"),
     );
 
@@ -35,6 +33,7 @@ class MyHomePage extends StatefulWidget {
 class _MyPageState extends State<MyHomePage> {
   Future<List<Item>> _getItem() async {
     var data = await http.get("https://thegreen.studio/ecommerce/default/item-json.php");
+
     var jsonData = json.decode(data.body);
     print(jsonData);
     List<Item> items = [];
@@ -51,6 +50,7 @@ class _MyPageState extends State<MyHomePage> {
       appBar: new AppBar(
         title: new Text(widget.title),
       ),
+      drawer: MainDrawer(),
       body:Container(
         padding:EdgeInsets.all(10),
         child:FutureBuilder(
@@ -134,13 +134,8 @@ class _DetailPageState extends State<DetailPage> {
       appBar: AppBar(
         title:Text(widget.item.Description),
       ),
-      drawer: new Drawer(
-        child: ListView(
-          children: <Widget>[
-           Text(widget.item.Description),
-          ],
-        ),
-      ),
+
+
 
       body: Container(
         child:Container(
@@ -192,7 +187,7 @@ class _DetailPageState extends State<DetailPage> {
                 ),
               ),
 
-              
+
 
               Container(
                 child: SizedBox(
