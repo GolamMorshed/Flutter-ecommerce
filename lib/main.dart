@@ -35,7 +35,7 @@ class _MyPageState extends State<MyHomePage> {
     var data = await http.get("https://thegreen.studio/ecommerce/default/item-json.php");
 
     var jsonData = json.decode(data.body);
-    print(jsonData);
+    //print(jsonData);
     List<Item> items = [];
     for(var i in jsonData){
       Item item = Item(i["ItemCode"],i["UserMememberNo"],i["Description"],i["Image"],i["Image1"],i["Image2"],i["Image3"],i["Image4"]);

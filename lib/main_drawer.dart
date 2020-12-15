@@ -1,9 +1,54 @@
 
-import 'dart:ui';
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import './main.dart';
-class MainDrawer extends StatelessWidget{
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
+
+class MainDrawer extends StatefulWidget{
+
+  @override
+  _MainDrawerState createState() => _MainDrawerState();
+}
+
+class _MainDrawerState extends State<MainDrawer> {
+
+  Future<List<Categories>> _getCategory() async {
+    var data = await http.get("https://thegreen.studio/ecommerce/default/category-json.php");
+    var jsonData = json.decode(data.body);
+    //print(jsonData["body"]);
+
+    List<Categories> categoriesList = [];
+
+    for(var c in jsonData)
+      {
+
+          Categories a = Categories(c["Name"]);
+          categoriesList.add(a);
+
+
+      }
+
+    // jsonData.body.forEach((c) {
+    //
+    //   print(c.Name);
+    //   Categories a = Categories(c["Name"]);
+    //   categoriesList.add(a);
+    //
+    // });
+
+
+    print(categoriesList.length);
+    return categoriesList;
+  }
+
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
       return Drawer(
@@ -59,6 +104,33 @@ class MainDrawer extends StatelessWidget{
 
               },
             ),
+
+
+            Container(
+              child: Expanded(
+                child: FutureBuilder(
+                  future: _getCategory(),
+                  builder: (BuildContext context, AsyncSnapshot snapshot){
+                    if(snapshot.data == null){
+                      return Container(
+                        child: Text("Loading..."),
+                      );
+                    }else{
+                      return ListView.builder(
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (BuildContext context, int index){
+                          //final x = snapshot.data[index];
+                          return ListTile(
+                            title: Text(snapshot.data[index].Name),
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+
+            ),
             ListTile(
               leading: Icon(Icons.settings),
               title: Text("Settings",style: TextStyle(
@@ -76,5 +148,12 @@ class MainDrawer extends StatelessWidget{
       );
   }
 
-
 }
+
+class Categories{
+  final String Name;
+  Categories(this.Name);
+}
+
+
+
