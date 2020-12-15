@@ -1,5 +1,7 @@
 
 
+
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import './main.dart';
@@ -122,6 +124,10 @@ class _MainDrawerState extends State<MainDrawer> {
                           //final x = snapshot.data[index];
                           return ListTile(
                             title: Text(snapshot.data[index].Name),
+                            onTap: (){
+                              Navigator.push(context, new MaterialPageRoute(builder: (context) => ViewCategory(snapshot.data[index].Name)));
+                          },
+
                           );
                         },
                       );
@@ -150,10 +156,26 @@ class _MainDrawerState extends State<MainDrawer> {
 
 }
 
+
+//CATEGORY CLASS
 class Categories{
   final String Name;
   Categories(this.Name);
 }
 
+//VIEW FULL CATEGORY LIST CLASS
+class ViewCategory extends StatelessWidget{
+  final String Name;
+  ViewCategory(this.Name);
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(Name),
+      ),
+    );
+  }
+
+}
 
