@@ -1,7 +1,4 @@
 
-
-
-
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import './main.dart';
@@ -21,35 +18,15 @@ class _MainDrawerState extends State<MainDrawer> {
     var data = await http.get("https://thegreen.studio/ecommerce/default/category-json.php");
     var jsonData = json.decode(data.body);
     //print(jsonData["body"]);
-
     List<Categories> categoriesList = [];
-
     for(var c in jsonData)
       {
-
           Categories a = Categories(c["Name"]);
           categoriesList.add(a);
-
-
       }
-
-    // jsonData.body.forEach((c) {
-    //
-    //   print(c.Name);
-    //   Categories a = Categories(c["Name"]);
-    //   categoriesList.add(a);
-    //
-    // });
-
-
     print(categoriesList.length);
     return categoriesList;
   }
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -164,8 +141,9 @@ class Categories{
 }
 
 //VIEW FULL CATEGORY LIST CLASS
-class ViewCategory extends StatelessWidget{
+class ViewCategory extends StatelessWidget {
   final String Name;
+
   ViewCategory(this.Name);
 
   @override
@@ -176,6 +154,12 @@ class ViewCategory extends StatelessWidget{
       ),
     );
   }
-
 }
+//CATEGORY VIEW CLASS
+class CategoryList {
+  final String ItemModel;
+  CategoryList(this.ItemModel);
+}
+
+
 
