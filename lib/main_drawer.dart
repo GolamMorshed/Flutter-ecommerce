@@ -140,26 +140,89 @@ class Categories{
   Categories(this.Name);
 }
 
-//VIEW FULL CATEGORY LIST CLASS
-class ViewCategory extends StatelessWidget {
-  final String Name;
+//CATEGORY VIEW CLASS
+class CategoryList {
+  final String ItemModel;
+  final String Image;
+  final String UserMememberNo;
+  CategoryList(this.ItemModel,this.Image,this.UserMememberNo);
+}
 
+class ViewCategory extends StatefulWidget{
+  final String Name;
   ViewCategory(this.Name);
+
+  @override
+  _ViewCategoryState createState() => _ViewCategoryState();
+}
+
+class _ViewCategoryState extends State<ViewCategory> {
+
+  Future<List<CategoryList>> _getCategoryList() async {
+  var data = await http.get("https://thegreen.studio/ecommerce/default/item-category-json.php?CategoryName="+widget.Name);
+   var jsonData =json.decode(data.body);
+
+   List<CategoryList> cList = [];
+   for(var i in jsonData) {
+     CategoryList cate = CategoryList(i["ItemModel"],i["Image"],i["UserMememberNo"]);
+     cList.add(cate);
+   }
+   return cList;
+
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Name),
+        title: Text(widget.Name),
       ),
+      body: Container(
+        child: FutureBuilder(
+          future: _getCategoryList(),
+          builder: (BuildContext context, AsyncSnapshot snapshot){
+            if(snapshot.data == null) {
+              return Container(
+                child: Center(
+                  child: Text("Loading..."),
+                ),
+              );
+            }else{
+              return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index){
+                  final x = snapshot.data[index];
+                  return Card(
+                    child: GestureDetector(
+                      onTap: (){
+
+                      },
+                      child: Column(
+                        children: <Widget>[
+                          Image.network("https://thegreen.studio/ecommerce/default/upload/"+x.Image,
+                        width:200.0,
+                        height:150.0,
+                        fit:BoxFit.cover),
+                          Text(x.UserMememberNo),
+                          Text("Price: RM:134"),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+          },
+          
+        ),
+      )
+
     );
   }
 }
-//CATEGORY VIEW CLASS
-class CategoryList {
-  final String ItemModel;
-  CategoryList(this.ItemModel);
-}
+
+
+
 
 
 
