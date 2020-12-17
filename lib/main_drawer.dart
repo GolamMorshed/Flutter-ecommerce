@@ -6,13 +6,11 @@ import 'dart:convert';
 import 'dart:async';
 
 class MainDrawer extends StatefulWidget{
-
   @override
   _MainDrawerState createState() => _MainDrawerState();
 }
 
 class _MainDrawerState extends State<MainDrawer> {
-
   Future<List<Categories>> _getCategory() async {
     var data = await http.get("https://thegreen.studio/ecommerce/default/category-json.php");
     var jsonData = json.decode(data.body);
