@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import './main.dart';
 import 'package:http/http.dart' as http;
@@ -154,6 +155,8 @@ class ViewCategory extends StatefulWidget{
 
 class _ViewCategoryState extends State<ViewCategory> {
 
+  Dio dio = new Dio();
+
   Future<List<CategoryList>> _getCategoryList() async {
   var data = await http.get("https://thegreen.studio/ecommerce/default/item-category-json.php?CategoryName="+widget.Name);
    var jsonData =json.decode(data.body);
@@ -166,6 +169,9 @@ class _ViewCategoryState extends State<ViewCategory> {
    return cList;
 
 }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -224,6 +230,29 @@ class DetailPage extends StatefulWidget{
 
 class _DetailPageState extends State<DetailPage> {
   int _count = 1;
+
+
+
+  //POST METHOD
+  Dio dio = new Dio();
+  Future postData() async {
+    final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CreateCartAPI.php";
+    dynamic data = {
+      "ItemCode":"2",
+      "UserID":"U12",
+      "Variation":"variation",
+      "Quantity":2,
+      "GST": 2,
+      "Price":3,
+      "DeliveryCharge": 5
+    };
+    var response = await dio.post(url,data: data,options: Options(
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        }
+    ));
+    return response.data;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -374,8 +403,10 @@ class _DetailPageState extends State<DetailPage> {
                       width: 350,
                       child: FlatButton(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                        onPressed: (){
-
+                        onPressed: () async{
+                          await postData().then((value){
+                            print(value);
+                          });
                         },
                         color: Colors.blue,
                         child: Text("BUY NOW".toUpperCase(),style: TextStyle(
