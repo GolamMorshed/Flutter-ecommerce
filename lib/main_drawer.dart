@@ -1,4 +1,3 @@
-
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import './main.dart';
@@ -27,7 +26,6 @@ class _MainDrawerState extends State<MainDrawer> {
     print(categoriesList.length);
     return categoriesList;
   }
-
   @override
   Widget build(BuildContext context) {
       return Drawer(
@@ -80,11 +78,8 @@ class _MainDrawerState extends State<MainDrawer> {
                 fontSize:18,
               ),),
               onTap: (){
-
               },
             ),
-
-
             Container(
               child: Expanded(
                 child: FutureBuilder(
@@ -104,7 +99,6 @@ class _MainDrawerState extends State<MainDrawer> {
                             onTap: (){
                               Navigator.push(context, new MaterialPageRoute(builder: (context) => ViewCategory(snapshot.data[index].Name)));
                           },
-
                           );
                         },
                       );
@@ -130,7 +124,6 @@ class _MainDrawerState extends State<MainDrawer> {
         ),
       );
   }
-
 }
 
 
@@ -218,33 +211,15 @@ class _ViewCategoryState extends State<ViewCategory> {
               );
             }
           },
-          
         ),
       )
-
     );
   }
 }
 
-// //CLASS FOR SINGLE ITEM VIEW
-// class CategoryList {
-//   final String UserMememberNo;
-//   final String Description;
-//   final String Image;
-//   final String Image1;
-//   final String Image2;
-//   final String Image3;
-//   final String Image4;
-//
-//   CategoryList(this.UserMememberNo, this.Description, this.Image, this.Image1, this.Image2, this.Image3, this.Image4);
-// }
-
 class DetailPage extends StatefulWidget{
   final CategoryList cList;
-
   DetailPage(this.cList);
-
-
   @override
   _DetailPageState createState() => _DetailPageState();
 }
@@ -257,9 +232,6 @@ class _DetailPageState extends State<DetailPage> {
       appBar: AppBar(
         title:Text(widget.cList.Description),
       ),
-
-
-
       body: Container(
         child:Container(
           child: Column(
@@ -273,7 +245,6 @@ class _DetailPageState extends State<DetailPage> {
                       height: 400.0,
                       fit: BoxFit.cover,
                     ),
-
                   ],
                 ),
               ),
@@ -309,20 +280,15 @@ class _DetailPageState extends State<DetailPage> {
                   ],
                 ),
               ),
-
-
-
               Container(
                 child: SizedBox(
                   child: Row(
                     children: <Widget>[
                       Text(widget.cList.UserMememberNo,style: TextStyle(
                         fontSize:30,
-
                       ),),
                     ],
                   ),
-
                 ),
               ),
               Container(
@@ -331,11 +297,9 @@ class _DetailPageState extends State<DetailPage> {
                     children: <Widget>[
                       Text("Price: RM12",style: TextStyle(
                         fontSize:30,
-
                       ),),
                     ],
                   ),
-
                 ),
               ),
               Container(
@@ -344,16 +308,12 @@ class _DetailPageState extends State<DetailPage> {
                     children: <Widget>[
                       Text(widget.cList.Description,style: TextStyle(
                         fontSize:20,
-
                       ),),
                     ],
                   ),
-
                 ),
               ),
-
               Container(
-
                 child: Row(
                   children: <Widget>[
                     SizedBox(
@@ -366,10 +326,8 @@ class _DetailPageState extends State<DetailPage> {
                               {
                                 _count = 1;
                               }
-
                               _count--;
                             });
-
                           },
                           padding: EdgeInsets.zero,
                           child: Icon(Icons.remove),
@@ -391,7 +349,6 @@ class _DetailPageState extends State<DetailPage> {
                             setState(() {
                               _count++;
                             });
-
                           },
                           padding: EdgeInsets.zero,
                           child: Icon(Icons.add),
@@ -399,11 +356,9 @@ class _DetailPageState extends State<DetailPage> {
                           //Icon(Icons.Add),
                         )
                     ),
-
                   ],
                 ),
               ),
-
               Container(
                 child: Row(
                   children: <Widget>[
@@ -438,7 +393,6 @@ class _DetailPageState extends State<DetailPage> {
               Container(
                 child: Column(
                   children: <Widget>[
-
                   ],
                 ),
               ),
@@ -446,8 +400,6 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ),
       ),
-
-
     );
   }
 }
