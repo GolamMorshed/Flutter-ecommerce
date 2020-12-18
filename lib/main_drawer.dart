@@ -134,6 +134,7 @@ class Categories{
 
 //CATEGORY VIEW CLASS
 class CategoryList {
+  final String ItemCode;
   final String ItemModel;
   final String Description;
   final String Image;
@@ -142,7 +143,8 @@ class CategoryList {
   final String Image3;
   final String Image4;
   final String UserMememberNo;
-  CategoryList(this.ItemModel,this.Image,this.UserMememberNo, this.Description, this.Image1, this.Image2, this.Image3, this.Image4);
+  CategoryList(this.ItemCode,this.ItemModel,this.Image,this.UserMememberNo, this.Description, this.Image1, this.Image2, this.Image3, this.Image4);
+
 }
 
 class ViewCategory extends StatefulWidget{
@@ -155,15 +157,17 @@ class ViewCategory extends StatefulWidget{
 
 class _ViewCategoryState extends State<ViewCategory> {
 
-  Dio dio = new Dio();
+
 
   Future<List<CategoryList>> _getCategoryList() async {
   var data = await http.get("https://thegreen.studio/ecommerce/default/item-category-json.php?CategoryName="+widget.Name);
    var jsonData =json.decode(data.body);
+   print(widget.Name);
+
 
    List<CategoryList> cList = [];
    for(var i in jsonData) {
-     CategoryList cate = CategoryList(i["ItemModel"],i["Image"],i["UserMememberNo"],i["Image1"],i["Image2"],i["Image3"],i["Image4"],i["Description"]);
+     CategoryList cate = CategoryList(i["ItemCode"],i["ItemModel"],i["Image"],i["UserMememberNo"],i["Image1"],i["Image2"],i["Image3"],i["Image4"],i["Description"]);
      cList.add(cate);
    }
    return cList;
@@ -224,25 +228,29 @@ class _ViewCategoryState extends State<ViewCategory> {
 class DetailPage extends StatefulWidget{
   final CategoryList cList;
   DetailPage(this.cList);
+
+
+
+
+
+
   @override
   _DetailPageState createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
   int _count = 1;
-
-
-
   //POST METHOD
   Dio dio = new Dio();
   Future postData() async {
     final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CreateCartAPI.php";
+    var cList;
     dynamic data = {
-      "ItemCode":"2",
+      "ItemCode":widget.cList.ItemCode,
       "UserID":"U12",
-      "Variation":"variation",
+      "Variation":"S,L,M",
       "Quantity":2,
-      "GST": 2,
+      "GST": 0,
       "Price":3,
       "DeliveryCharge": 5
     };
@@ -253,6 +261,8 @@ class _DetailPageState extends State<DetailPage> {
     ));
     return response.data;
   }
+
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
