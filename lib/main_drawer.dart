@@ -22,7 +22,6 @@ class _MainDrawerState extends State<MainDrawer> {
           Categories a = Categories(c["Name"]);
           categoriesList.add(a);
       }
-    print(categoriesList.length);
     return categoriesList;
   }
   @override
@@ -157,31 +156,28 @@ class ViewCategory extends StatefulWidget{
 
 class _ViewCategoryState extends State<ViewCategory> {
 
-
-
   Future<List<CategoryList>> _getCategoryList() async {
   var data = await http.get("https://thegreen.studio/ecommerce/default/item-category-json.php?CategoryName="+widget.Name);
    var jsonData =json.decode(data.body);
-   print(widget.Name);
-
-
    List<CategoryList> cList = [];
    for(var i in jsonData) {
      CategoryList cate = CategoryList(i["ItemCode"],i["ItemModel"],i["Image"],i["UserMememberNo"],i["Image1"],i["Image2"],i["Image3"],i["Image4"],i["Description"]);
      cList.add(cate);
    }
    return cList;
-
 }
-
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.Name),
+        actions: <Widget>[
+          new IconButton(icon: Icon(Icons.add_shopping_cart), onPressed: (){
+            Navigator.push(context, new MaterialPageRoute(builder: (context)=>ViewShoppingCart()));
+          }),
+        ],
+        
       ),
       body: Container(
         child: FutureBuilder(
@@ -228,12 +224,6 @@ class _ViewCategoryState extends State<ViewCategory> {
 class DetailPage extends StatefulWidget{
   final CategoryList cList;
   DetailPage(this.cList);
-
-
-
-
-
-
   @override
   _DetailPageState createState() => _DetailPageState();
 }
@@ -443,8 +433,81 @@ class _DetailPageState extends State<DetailPage> {
   }
 }
 
+//MODAL FOR SHOPPING Card
+class ShoppingCart {
+  final String UserMememberNo;
+  final String Image;
+  final String Variation;
+  final String Quantity;
+  final String Price;
 
+  ShoppingCart(this.UserMememberNo, this.Image, this.Variation, this.Quantity, this.Price);
+}
 
+class ViewShoppingCart extends StatefulWidget{
+  @override
+  _ViewShoppingCartState createState() => _ViewShoppingCartState();
+}
+
+class _ViewShoppingCartState extends State<ViewShoppingCart> {
+
+  Future<List<ShoppingCart>>  _getCartList() async{
+    var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartListAPI.php");
+    var jsonData = json.decode(data.body);
+    List<ShoppingCart> cartList = [];
+    for(var i in jsonData["body"]){
+      ShoppingCart sCart = ShoppingCart(i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"]);
+      cartList.add(sCart);
+    }
+    print(cartList);
+    return cartList;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+   return new Scaffold(
+     appBar: new AppBar(
+       title: new Text("Cart"),
+     ),
+     body: Container(
+       child: FutureBuilder(
+         future: _getCartList(),
+         builder: (BuildContext context, AsyncSnapshot snapshot){
+
+           if(snapshot.data == null){
+             return Container(
+                child: Center(
+                  child: Text("Loading..."),
+                ),
+             );
+           } else{
+             return ListView.builder(
+                 padding: EdgeInsets.all(20),
+                 itemCount: snapshot.data.length,
+                 itemBuilder: (BuildContext context, int index){
+                   return ListTile(
+                     leading: Image.network("https://thegreen.studio/ecommerce/default/upload/"+snapshot.data[index].Image,
+                       width: 100.0,
+                       height: 100.0,
+                       fit: BoxFit.cover),
+                     title: Text(snapshot.data[index].UserMememberNo),
+                     subtitle: Column(
+                       children: <Widget>[
+                         Text(snapshot.data[index].Variation),
+                         Text(snapshot.data[index].Price),
+                       ],
+                     ),
+                     //subtitle: Text(snapshot.data[index].Variation),
+
+                   );
+                 });
+           }
+         },
+       ),
+     ),
+   );
+  }
+}
 
 
 
