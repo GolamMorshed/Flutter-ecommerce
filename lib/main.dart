@@ -208,11 +208,9 @@ class _DetailPageState extends State<DetailPage> {
                     children: <Widget>[
                       Text("Price: RM12",style: TextStyle(
                         fontSize:30,
-
                       ),),
                     ],
                   ),
-
                 ),
               ),
               Container(
@@ -221,7 +219,6 @@ class _DetailPageState extends State<DetailPage> {
                     children: <Widget>[
                       Text(widget.item.Description,style: TextStyle(
                         fontSize:20,
-
                       ),),
                     ],
                   ),
@@ -230,7 +227,6 @@ class _DetailPageState extends State<DetailPage> {
               ),
 
               Container(
-
                 child: Row(
                   children: <Widget>[
                     SizedBox(
@@ -243,7 +239,6 @@ class _DetailPageState extends State<DetailPage> {
                                 {
                                   _count = 1;
                                 }
-
                               _count--;
                             });
 
@@ -268,7 +263,6 @@ class _DetailPageState extends State<DetailPage> {
                             setState(() {
                               _count++;
                             });
-
                           },
                           padding: EdgeInsets.zero,
                           child: Icon(Icons.add),
@@ -276,7 +270,6 @@ class _DetailPageState extends State<DetailPage> {
                           //Icon(Icons.Add),
                         )
                     ),
-
                   ],
                 ),
               ),
@@ -302,7 +295,7 @@ class _DetailPageState extends State<DetailPage> {
 
                         },
                         color: Colors.blue,
-                        child: Text("BUY NOW".toUpperCase(),style: TextStyle(
+                        child: Text("Buy Now".toUpperCase(),style: TextStyle(
                           fontSize:17,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,

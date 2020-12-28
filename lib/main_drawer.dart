@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -435,13 +436,16 @@ class _DetailPageState extends State<DetailPage> {
 
 //MODAL FOR SHOPPING Card
 class ShoppingCart {
+  final String Description;
   final String UserMememberNo;
   final String Image;
   final String Variation;
   final String Quantity;
   final String Price;
+  final String GUID;
 
-  ShoppingCart(this.UserMememberNo, this.Image, this.Variation, this.Quantity, this.Price);
+
+  ShoppingCart(this.Description,this.UserMememberNo, this.Image, this.Variation, this.Quantity, this.Price,this.GUID);
 }
 
 class ViewShoppingCart extends StatefulWidget{
@@ -451,20 +455,44 @@ class ViewShoppingCart extends StatefulWidget{
 
 class _ViewShoppingCartState extends State<ViewShoppingCart> {
 
-  Future<List<ShoppingCart>>  _getCartList() async{
+  var sumOfPrice;
+
+  @override
+  void initState(){
+    super.initState();
+
+  }
+
+
+  Future<List<ShoppingCart>> _getCartList() async{
+    var Total = [];
+    var sum;
     var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartListAPI.php");
     var jsonData = json.decode(data.body);
+
     List<ShoppingCart> cartList = [];
     for(var i in jsonData["body"]){
-      ShoppingCart sCart = ShoppingCart(i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"]);
+      ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"]);
       cartList.add(sCart);
+      Total.add(sCart.Price);
     }
-    print(cartList);
+    print(Total);
+
+    // for(var i = 0; i < Total.length; i ++){
+    //   sum += Total[i].parseInt();
+    // }
+
+
+
+    sum = Total.reduce((sum, element) => sum + element);
+    sumOfPrice = sum;
+    //print(sumOfPrice);
     return cartList;
   }
 
   @override
   Widget build(BuildContext context) {
+
    return new Scaffold(
      appBar: new AppBar(
        title: new Text("Cart"),
@@ -481,32 +509,250 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
                 ),
              );
            } else{
-             return ListView.builder(
-                 padding: EdgeInsets.all(20),
-                 itemCount: snapshot.data.length,
-                 itemBuilder: (BuildContext context, int index){
-                   return ListTile(
-                     leading: Image.network("https://thegreen.studio/ecommerce/default/upload/"+snapshot.data[index].Image,
-                       width: 100.0,
-                       height: 100.0,
-                       fit: BoxFit.cover),
-                     title: Text(snapshot.data[index].UserMememberNo),
-                     subtitle: Column(
-                       children: <Widget>[
-                         Text(snapshot.data[index].Variation),
-                         Text(snapshot.data[index].Price),
-                       ],
-                     ),
-                     //subtitle: Text(snapshot.data[index].Variation),
+             return Container(
+               child: ListView.builder(
+                   //padding: EdgeInsets.all(10),
+                   itemCount: snapshot.data.length,
+                   itemBuilder: (BuildContext context, int index){
+                     final x = snapshot.data[index];
+                     var _count = snapshot.data[index].Quantity;
+                     // return Container(
+                     //    width: 80.0,
+                     //    height: 80.0,
+                     //    padding: EdgeInsets.all(4.0),
+                     //    decoration: BoxDecoration(
+                     //      //color: Colors.grey[400],
+                     //      image: DecorationImage(
+                     //        fit: BoxFit.scaleDown,
+                     //        image: NetworkImage("https://thegreen.studio/ecommerce/default/upload/"+x.Image),
+                     //      ),
+                     //      borderRadius: BorderRadius.circular(20.0),
+                     //    ),
+                     //
+                     // );
 
-                   );
-                 });
+                     return ListTile(
+                      leading: Image.network("https://thegreen.studio/ecommerce/default/upload/"+snapshot.data[index].Image,
+                        width: 100.0, height: 150.0,
+                        fit: BoxFit.cover),
+                      title:  Text(snapshot.data[index].Description),
+                       subtitle: Row(
+                         mainAxisAlignment: MainAxisAlignment.spaceAround,
+                         children: <Widget>[
+                         Text(snapshot.data[index].Price),
+                         Text(snapshot.data[index].Variation),
+                         SizedBox(
+                             width: 40,
+                             height: 32,
+                             child:OutlineButton(
+                               onPressed: (){
+                                 minusQuantity(snapshot.data[index].GUID,
+                                     snapshot.data[index].Quantity);
+                                 setState(() {
+                                   if(_count <= 1)
+                                   {
+                                     _count = 1;
+                                   }
+                                   _count--;
+                                 });
+
+                               },
+                               padding: EdgeInsets.zero,
+                               child: Icon(Icons.remove),
+                               shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                               //Icon(Icons.remove),
+                             )
+                         ),
+                         SizedBox(
+                           width: 40,
+                           height: 32,
+                           //padding:const EdgeInsets.symmetric(horizontal: kNoDefaultValue / 2),
+                           child:Text("$_count", style: Theme.of(context).textTheme.headline6),
+                         ),
+                         SizedBox(
+                             width: 40,
+                             height: 32,
+                             child:OutlineButton(
+                               onPressed: (){
+                                 plusQuantity(snapshot.data[index].GUID,
+                                     snapshot.data[index].Quantity);
+                                 setState(() {
+                                   _count++;
+                                 });
+                               },
+                               padding: EdgeInsets.zero,
+                               child: Icon(Icons.add),
+                               shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                               //Icon(Icons.Add),
+                             )
+                         ),
+                         OutlineButton(
+                           onPressed: () {
+
+                             var GUID =snapshot.data[index].GUID;
+                             //print(snapshot.data[index].GUID);
+                             RemoveItem(GUID);
+                           },
+                           child: Text('Remove'),
+                         ),
+                       ],
+                       ),
+                      );
+                   }),
+             );
            }
          },
        ),
      ),
+     bottomNavigationBar: Container(
+      child: Container(
+        child: Row(
+          children: <Widget>[
+            Text(" SubTotal "),
+            Text(":"),
+            //Text(sumOfPrice),
+            Text(sumOfPrice == null? '': sumOfPrice),
+            Container(
+              child: Row(
+                children: [
+                  OutlineButton(
+                     onPressed: () {
+                     print('Received Order');
+                     //Add to the order list
+                     Dio dio = new Dio();
+                     Future postData() async {
+                       final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Order/CreateOrderAPI.php";
+                       dynamic data = {
+                         "Name": "Salman",
+                         "PhoneNo": "775617",
+                         "HouseNo": "11-07",
+                         "Address1": "address1",
+                         "Address2": "address2",
+                         "Address3": "address3",
+                         "Address4": "address4",
+                         "PostCode": "94300",
+                         "City": "test",
+                         "State":"Sarawak",
+                         "Variation": "S",
+                         "Variation1": "S",
+                         "Variation2": "L",
+                         "Variation3": "Yellow",
+                         "Variation4": "Red",
+                         "Price":"12.2",
+                         "DeliveryCost": "7",
+                         "Quantity":"2",
+                         "DeliveryDate":"12/12/2020",
+                         "OrderStatus":"Active"
+                       };
+                       var response = await dio.post(url,data: data,options: Options(
+                           headers: {
+                             'Content-type': 'application/json; charset=UTF-8',
+                           }
+                       ));
+                       return response.data;
+                     }
+                     },
+                     child: Text('CheckOut'),
+                  ),
+                ],
+              ),
+            ),
+
+          ],
+        ),
+
+      ),
+
+       height: 174,
+       decoration: BoxDecoration(
+         color: Colors.white,
+         borderRadius: BorderRadius.only(topRight: Radius.circular(30)),
+         boxShadow: [
+           BoxShadow(
+             offset: Offset(0,-15),
+             blurRadius: 20,
+             color: Color(0xFFDADADA).withOpacity(0.15),
+           )
+         ]
+       ),
+     ),
    );
   }
+
+  void plusQuantity(GUID,Quantity) async{
+    print(GUID);
+    int q = int.parse(Quantity.toString());
+    int q1 = q + 1;
+    print(q1);
+
+    Dio dio = new Dio();
+    Future updateQuantity() async{
+      final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/UpdateQuantityAPI.php";
+      dynamic data = {
+        "GUID":GUID,
+        "Quantity":q1
+
+      };
+      var response = await dio.post(url,data: data,options: Options(
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+          }
+      ));
+      return response.data;
+    }
+    await updateQuantity().then((value){
+      print(value);
+    });
+  }
+
+}
+
+void minusQuantity(GUID, Quantity) async{
+  print(GUID);
+  int q = int.parse(Quantity.toString());
+  int q1 = q - 1;
+  print(q1);
+
+  Dio dio = new Dio();
+  Future updateQuantity() async{
+    final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/UpdateQuantityAPI.php";
+    dynamic data = {
+      "GUID":GUID,
+      "Quantity":q1
+    };
+    var response = await dio.post(url,data: data,options: Options(
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        }
+    ));
+    return response.data;
+  }
+  await updateQuantity().then((value){
+    print(value);
+  });
+}
+
+
+void RemoveItem(GUID) async{
+  print(GUID);
+  Dio dio = new Dio();
+  Future deleteItem() async {
+    final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/DeleteItemAPI.php";
+    dynamic data = {
+      "GUID":GUID
+    };
+    var response = await dio.post(url,data: data,options: Options(
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        }
+    ));
+    return response.data;
+  }
+  await deleteItem().then((value){
+    print(value);
+
+  });
+
 }
 
 
