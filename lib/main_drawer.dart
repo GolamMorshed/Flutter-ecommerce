@@ -443,8 +443,6 @@ class ShoppingCart {
   final String Quantity;
   final String Price;
   final String GUID;
-
-
   ShoppingCart(this.Description,this.UserMememberNo, this.Image, this.Variation, this.Quantity, this.Price,this.GUID);
 }
 
@@ -454,55 +452,30 @@ class ViewShoppingCart extends StatefulWidget{
 }
 
 class _ViewShoppingCartState extends State<ViewShoppingCart> {
-
   var sumOfPrice;
-
   @override
   void initState(){
     super.initState();
     this._getCartList();
   }
-
-
   Future<List<ShoppingCart>> _getCartList() async{
     var Total = [];
     var sum;
     var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartListAPI.php");
     var jsonData = json.decode(data.body);
-
     List<ShoppingCart> cartList = [];
     for(var i in jsonData["body"]){
       ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"]);
       cartList.add(sCart);
-      //int price = int.parse(sCart.Price.toString());
       Total.add(sCart.Price);
     }
-    print(Total);
-
-    // for(var i = 0; i < Total.length; i ++){
-    //   int price = int.parse(i.toString());
-    //   sum += price;
-    // }
-    // print(sum);
-    //int s;
-    // for(var i = 0; i <= Total.length; i++){
-    //   //print(Total[i]);
-    //   //int price = int.parse(Total[i].toString());
-    //   //print(price);
-    //   //s = price+s;
-    // }
-    
     int t = 0;
     for(var a = 0; a < Total.length; a++){
      int price = int.parse(Total[a].toString());
      print(t+price);
      t = t + price;
     }
-    print(t);
     sumOfPrice = t.toString();
-
-    // sum = Total.reduce((sum, element) => sum + element);
-    // sumOfPrice = sum;
     return cartList;
   }
 
@@ -532,21 +505,6 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
                    itemBuilder: (BuildContext context, int index){
                      final x = snapshot.data[index];
                      var _count = snapshot.data[index].Quantity;
-                     // return Container(
-                     //    width: 80.0,
-                     //    height: 80.0,
-                     //    padding: EdgeInsets.all(4.0),
-                     //    decoration: BoxDecoration(
-                     //      //color: Colors.grey[400],
-                     //      image: DecorationImage(
-                     //        fit: BoxFit.scaleDown,
-                     //        image: NetworkImage("https://thegreen.studio/ecommerce/default/upload/"+x.Image),
-                     //      ),
-                     //      borderRadius: BorderRadius.circular(20.0),
-                     //    ),
-                     //
-                     // );
-
                      return ListTile(
                       leading: Image.network("https://thegreen.studio/ecommerce/default/upload/"+snapshot.data[index].Image,
                         width: 100.0, height: 150.0,
@@ -644,10 +602,8 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
                 ],
               ),
             ),
-
           ],
         ),
-
       ),
 
        height: 174,
@@ -667,12 +623,10 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
   }
 
   void plusQuantity(GUID,Quantity,Price) async{
-    print(GUID);
     int q = int.parse(Quantity.toString());
     int price = int.parse(Price.toString());
     int q1 = q + 1;
     int p = q1 * price;
-    //print(p);
 
     Dio dio = new Dio();
     Future updateQuantity() async{
@@ -695,51 +649,22 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
   }
 
   void addToOrder() async{
-
-      //GET DATA FORM REQUEST
+    //GET DATA FORM REQUEST
     Future<List<ShoppingCart>> _getCartList() async{
       var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartListAPI.php");
       var jsonData = json.decode(data.body);
-      //print(jsonData["body"].length);
-
         for(var i in jsonData["body"]){
           ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"]);
           sendDataToOrderList(sCart);
-
-
         }
-
-
-
-
     }
     await _getCartList().then((value){
       print(value);
       initState();
     });
 
-
-
-
-
-
-
-
-
-
-
-    // Future<List<ShoppingCart>> _getCartList() async{
-    //   var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartListAPI.php");
-    //   var jsonData = json.decode(data.body);
-    //
-    // }
-    // await _getCartList().then((value){
-    //   print(value);
-    //   initState();
-    // });
-
 }
-
+//PLUS QUANTITY
 void minusQuantity(GUID, Quantity, Price) async{
   print(GUID);
   int q = int.parse(Quantity.toString());
@@ -769,7 +694,7 @@ void minusQuantity(GUID, Quantity, Price) async{
   });
 }
 
-
+//MINUS QUANTITY
 void RemoveItem(GUID) async {
   print(GUID);
   Dio dio = new Dio();
@@ -789,7 +714,7 @@ void RemoveItem(GUID) async {
     print(value);
   });
 }
-
+//ADD CART VALUE INOT ORDER LIST
   void sendDataToOrderList(sCart) async{
     Dio dio = new Dio();
     Future postData() async {
