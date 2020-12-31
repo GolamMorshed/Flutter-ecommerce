@@ -319,58 +319,43 @@ class _SignUpState extends State<SignUp> {
       appBar: AppBar(
         title: Text("Registration"),
       ),
-      body: Container(
-        child: Column(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                TextField(
-                  controller: registration_email,
-                  decoration:  InputDecoration(prefixIcon: Icon(Icons.account_box)),
-                ),
-                TextField(
-                  controller: registration_password,
-                  decoration: InputDecoration(prefixIcon: Icon(Icons.lock)),
-                ),
-                MaterialButton(onPressed: (){
-                  UserRegistration();
-                },child:Text("Sign In"),
-                ),
-                MaterialButton(onPressed: (){
-                  UserRegistration();
-                },child:Text("Sign Up"),
-                ),
-              ],
-            ),
-          ],
+      body: Center(
+        child: Container(
+          child: Column(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  TextField(
+                    controller: registration_email,
+                    decoration:  InputDecoration(prefixIcon: Icon(Icons.account_box)),
+                  ),
+                  TextField(
+                    controller: registration_password,
+                    decoration: InputDecoration(prefixIcon: Icon(Icons.lock)),
+                  ),
+                  MaterialButton(onPressed: (){
+                    UserRegistration();
+                  },child:Text("Sign In"),
+                  ),
+                  MaterialButton(onPressed: (){
+                    UserRegistration();
+                  },child:Text("Sign Up"),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   void UserRegistration() async{
-        var url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Login_Registration/registration.php";
-        var response = await http.post(url,body:{
-          "email":registration_email.text,
-          "password":registration_password.text,
-        });
 
-        var data = json.decode(response.body);
-        if(data == "Success"){
-          await FlutterSession().set('GUID',registration_email.text);
+        if(registration_email.text == '' || registration_password.text == ''){
           Fluttertoast.showToast(
-              msg: "You successfully register",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 5,
-              backgroundColor: Colors.blue,
-              textColor: Colors.white,
-              fontSize: 16.0
-          );
-        }else{
-          Fluttertoast.showToast(
-              msg: "This email already registered",
+              msg: "Please fillup the email and password",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 5,
@@ -378,7 +363,38 @@ class _SignUpState extends State<SignUp> {
               textColor: Colors.white,
               fontSize: 16.0
           );
+        }else{
+          var url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Login_Registration/registration.php";
+          var response = await http.post(url,body:{
+            "email":registration_email.text,
+            "password":registration_password.text,
+          });
+
+          var data = json.decode(response.body);
+          if(data == "Success"){
+           // await FlutterSession().set('GUID',registration_email.text);
+            Fluttertoast.showToast(
+                msg: "You successfully register",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 5,
+                backgroundColor: Colors.blue,
+                textColor: Colors.white,
+                fontSize: 16.0
+            );
+          }else{
+            Fluttertoast.showToast(
+                msg: "This email already registered",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 5,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0
+            );
+          }
         }
+
   }
 }
 
