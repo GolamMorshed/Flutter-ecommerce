@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_session/flutter_session.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import './main.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -177,6 +179,9 @@ class _ViewCategoryState extends State<ViewCategory> {
           new IconButton(icon: Icon(Icons.add_shopping_cart), onPressed: (){
             Navigator.push(context, new MaterialPageRoute(builder: (context)=>ViewShoppingCart()));
           }),
+          new IconButton(icon: Icon(Icons.login_rounded), onPressed: (){
+            Navigator.push(context, new MaterialPageRoute(builder: (context)=>LoginPage()));
+          }),
         ],
         
       ),
@@ -221,6 +226,188 @@ class _ViewCategoryState extends State<ViewCategory> {
     );
   }
 }
+
+
+//LOGIN PAGE CLASS
+class LoginPage extends StatefulWidget{
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  TextEditingController email, password;
+  bool signin = true;
+
+
+  @override
+  void initState(){
+    super.initState();
+    email = new TextEditingController();
+    password = new TextEditingController();
+  }
+  @override
+  Widget build(BuildContext context) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Login"),
+        ),
+       body: Container(
+         child: Column(
+           children: [
+             Column(
+               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+               children: <Widget>[
+                 TextField(
+                   controller: email,
+                   decoration:  InputDecoration(prefixIcon: Icon(Icons.account_box)),
+                 ),
+                 TextField(
+                   controller: password,
+                  decoration: InputDecoration(prefixIcon: Icon(Icons.lock)),
+                 ),
+                 MaterialButton(onPressed: (){
+                   UserLogin();
+                 },child:Text("Sign In"),
+                 ),
+                 MaterialButton(onPressed: (){
+                   Navigator.push(context, MaterialPageRoute(builder: (context)=>SignUp()));
+                 },child:Text("Sign Up"),
+                 ),
+               ],
+             ),
+           ],
+         ),
+       ),
+      );
+  }
+//USER LOGIN METHOD
+  void UserLogin() async{
+    var url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Login_Registration/login.php";
+    var response = await http.post(url,body:{
+      "email":email.text,
+      "password":password.text,
+    });
+
+    var data = json.decode(response.body);
+    if(data == "Success"){
+      await FlutterSession().set('GUID',email.text);
+      print("login");
+      Navigator.push(context, MaterialPageRoute(builder: (context)=> UserProfile()));
+    }else{
+      print("username incorrect");
+    }
+  }
+}
+//CLASS FOR USER SIGNUP
+class SignUp extends StatefulWidget{
+  @override
+  _SignUpState createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
+  TextEditingController registration_email, registration_password;
+  @override
+  void initState(){
+    super.initState();
+    registration_email = new TextEditingController();
+    registration_password = new TextEditingController();
+
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Registration"),
+      ),
+      body: Container(
+        child: Column(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                TextField(
+                  controller: registration_email,
+                  decoration:  InputDecoration(prefixIcon: Icon(Icons.account_box)),
+                ),
+                TextField(
+                  controller: registration_password,
+                  decoration: InputDecoration(prefixIcon: Icon(Icons.lock)),
+                ),
+                MaterialButton(onPressed: (){
+                  UserRegistration();
+                },child:Text("Sign In"),
+                ),
+                MaterialButton(onPressed: (){
+                  UserRegistration();
+                },child:Text("Sign Up"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void UserRegistration() async{
+        var url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Login_Registration/registration.php";
+        var response = await http.post(url,body:{
+          "email":registration_email.text,
+          "password":registration_password.text,
+        });
+
+        var data = json.decode(response.body);
+        if(data == "Success"){
+          await FlutterSession().set('GUID',registration_email.text);
+          Fluttertoast.showToast(
+              msg: "You successfully register",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 5,
+              backgroundColor: Colors.blue,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
+        }else{
+          Fluttertoast.showToast(
+              msg: "This email already registered",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 5,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
+        }
+  }
+}
+
+class UserProfile extends StatefulWidget{
+  @override
+  _UserProfileState createState() => _UserProfileState();
+}
+
+class _UserProfileState extends State<UserProfile> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("welcome to home page")),
+      body: ListView(
+        children: <Widget>[
+          FutureBuilder(
+            future: FlutterSession().get('GUID'),
+              builder: (context,snapshot){
+            return Text(snapshot.hasData ? snapshot.data: 'Loading....');
+          })
+        ],
+      )
+
+
+    );
+  }
+}
+
+
 
 class DetailPage extends StatefulWidget{
   final CategoryList cList;
@@ -434,7 +621,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 }
 
-//MODAL FOR SHOPPING Card
+//MODAL FOR SHOPPING CARD
 class ShoppingCart {
   final String Description;
   final String UserMememberNo;
