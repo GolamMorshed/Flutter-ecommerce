@@ -8,6 +8,7 @@ import './main.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainDrawer extends StatefulWidget{
   @override
@@ -53,7 +54,6 @@ class _MainDrawerState extends State<MainDrawer> {
                           ), fit:BoxFit.fill
                         )
                       ),
-
                     ),
                     Text("Riyal",style: TextStyle(
                       color: Colors.white,
@@ -158,7 +158,6 @@ class ViewCategory extends StatefulWidget{
 }
 
 class _ViewCategoryState extends State<ViewCategory> {
-
   Future<List<CategoryList>> _getCategoryList() async {
   var data = await http.get("https://thegreen.studio/ecommerce/default/item-category-json.php?CategoryName="+widget.Name);
    var jsonData =json.decode(data.body);
@@ -290,8 +289,8 @@ class _LoginPageState extends State<LoginPage> {
 
     var data = json.decode(response.body);
     if(data == "Success"){
-      await FlutterSession().set('GUID',email.text);
-      print("login");
+      var foo = await FlutterSession().set('GUID',email.text);
+
       Navigator.push(context, MaterialPageRoute(builder: (context)=> UserProfile()));
     }else{
       print("username incorrect");
@@ -352,10 +351,38 @@ class _SignUpState extends State<SignUp> {
   }
 
   void UserRegistration() async{
+      if(registration_email.text == '' || registration_password.text == ''){
+        Fluttertoast.showToast(
+            msg: "Please fillup the email and password",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 5,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }else{
+        var url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Login_Registration/registration.php";
+        var response = await http.post(url,body:{
+          "email":registration_email.text,
+          "password":registration_password.text,
+        });
 
-        if(registration_email.text == '' || registration_password.text == ''){
+        var data = json.decode(response.body);
+        if(data == "Success"){
+         // await FlutterSession().set('GUID',registration_email.text);
           Fluttertoast.showToast(
-              msg: "Please fillup the email and password",
+              msg: "You successfully register",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 5,
+              backgroundColor: Colors.blue,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
+        }else{
+          Fluttertoast.showToast(
+              msg: "This email already registered.",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 5,
@@ -363,64 +390,214 @@ class _SignUpState extends State<SignUp> {
               textColor: Colors.white,
               fontSize: 16.0
           );
-        }else{
-          var url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Login_Registration/registration.php";
-          var response = await http.post(url,body:{
-            "email":registration_email.text,
-            "password":registration_password.text,
-          });
-
-          var data = json.decode(response.body);
-          if(data == "Success"){
-           // await FlutterSession().set('GUID',registration_email.text);
-            Fluttertoast.showToast(
-                msg: "You successfully register",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.CENTER,
-                timeInSecForIosWeb: 5,
-                backgroundColor: Colors.blue,
-                textColor: Colors.white,
-                fontSize: 16.0
-            );
-          }else{
-            Fluttertoast.showToast(
-                msg: "This email already registered",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.CENTER,
-                timeInSecForIosWeb: 5,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-                fontSize: 16.0
-            );
-          }
         }
-
+      }
   }
 }
 
+
+//USER INFORMATION MODEL
+class UserInformation {
+   String Name;
+   String Password;
+   String Address1;
+   String Gender;
+   String PhoneNo;
+   String Email;
+
+  UserInformation(this.Name, this.Password, this.Address1, this.Gender, this.PhoneNo, this.Email);
+
+
+  UserInformation.fromJson(Map<String, dynamic>json){
+    Name = json["Name"];
+    Password = json["Password"];
+    Address1 = json["Address1"];
+    Gender = json["Gender"];
+    PhoneNo = json["PhoneNo"];
+    Email = json["Email"];
+  }
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['Name'] = this.Name;
+    data['Password'] = this.Password;
+    data['Address1'] = this.Address1;
+    data['Gender'] = this.Gender;
+    data['PhoneNo'] = this.PhoneNo;
+    data['Email'] = this.Email;
+    return data;
+  }
+
+
+}
+
 class UserProfile extends StatefulWidget{
+
+
   @override
   _UserProfileState createState() => _UserProfileState();
 }
 
-class _UserProfileState extends State<UserProfile> {
+class _UserProfileState extends State<UserProfile>{
+
+  // Future<List<UserInformation>>  _getUserInformation() async{
+  //   var email = await FlutterSession().get("GUID");
+  //   var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+  //   //var jsonData = jsonDecode(data.body);
+  //
+  //   UserInformation uInfo = UserInformation.fromJson((jsonDecode(data.body)));
+  //
+  //   // List<UserInformation> userInformation = [];
+  //   // for (var u in jsonData){
+  //   //   UserInformation uInfo = UserInformation(u["Name"],u["Password"],u["Address1"],u["Gender"],u["PhoneNo"],u["Email"]);
+  //   //   userInformation.add(uInfo);
+  //   // }
+  //   // //print(UserInformation);
+  //   //return userInformation;
+  // }
+  //
+  // //  _getUserInformation() async{
+  // //   var email = await FlutterSession().get("GUID");
+  // //   var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+  // //   var jsonData = jsonDecode(data.body);
+  // //   print(jsonData);
+  // // }
+
+
+
+  getUserInfo() async{
+    var email = await FlutterSession().get("GUID");
+    var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+    UserInformation u = UserInformation.fromJson(jsonDecode(data.body));
+    //print(u.Email);
+    return u;
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("welcome to home page")),
-      body: ListView(
-        children: <Widget>[
-          FutureBuilder(
-            future: FlutterSession().get('GUID'),
-              builder: (context,snapshot){
-            return Text(snapshot.hasData ? snapshot.data: 'Loading....');
-          })
-        ],
-      )
+      appBar: AppBar(title: Text("profile")),
+        body: ListView(
+          children: <Widget>[
+            FutureBuilder(
+                future: getUserInfo(),
+                builder: (context,snapshot){
+                  
+                  if(snapshot.data == null){
+                    return Container(
+                      child: Center(
+                        child: Text("Loading..."),
+                      ),
+                    );
+                  }else{
+                    return Container(
+                      child: Column(
+                        children: <Widget>[
+                          const Image(
+                            image: NetworkImage('https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
+                          ),
+                          TextField(
+                            decoration:  InputDecoration(prefixIcon: Icon(Icons.account_box),hintText: snapshot.data.Name??'-------')
+                          ),
+                          TextField(
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.email),hintText: snapshot.data.Email??'-------')
+                          ),
+                          TextField(
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.lock),hintText: snapshot.data.Password??'-------')
+                          ),
+                          TextField(
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.accessibility),hintText: snapshot.data.Gender??'---------')
+                          ),
+                          TextField(
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.add_ic_call_sharp),hintText: snapshot.data.PhoneNo??'---------')
+                          ),
+                          TextField(
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: snapshot.data.Address1??'---------')
+                          ),
+
+
+
+
+                        ],
+                      ),
+                    );
+                  }
+                 // _getUserInformation();
+                  //getUserInfo();
+                  //return Text(snapshot.hasData ? snapshot.data: 'Loading....');
+                })
+          ],
+        )
+
+      // body: Container(
+      //   child: FutureBuilder(
+      //     future: getUserInfo(),
+      //     builder: (BuildContext context, AsyncSnapshot snapshot){
+      //       if(snapshot.data == null){
+      //         return Container(
+      //           child: Center(
+      //             child: Text("Loading..."),
+      //           ),
+      //         );
+      //       } else{
+      //         return Container(
+      //           child: ListView.builder(
+      //             //padding: EdgeInsets.all(10),
+      //
+      //               itemBuilder: (BuildContext context, int index){
+      //                 final x = snapshot.data[index];
+      //
+      //                 return ListTile(
+      //                   leading: Text(snapshot.data[index].Name),
+      //
+      //                   title:  Text(snapshot.data[index].Name),
+      //                   subtitle: Row(
+      //                     mainAxisAlignment: MainAxisAlignment.spaceAround,
+      //                     children: <Widget>[
+      //                       Text(snapshot.data[index].Name),
+      //                       Text(snapshot.data[index].Name),
+      //
+      //
+      //                     ],
+      //                   ),
+      //                 );
+      //               }),
+      //         );
+      //       }
+      //     },
+      //   ),
+      // ),
+      //
+
+
+
+      // body: Container(
+      //   child: FutureBuilder(
+      //     future: getUserInfo(),
+      //     builder: (BuildContext context, AsyncSnapshot snapshot){
+      //       return ListTile(
+      //         title: Text(snapshot.data[index].Name),
+      //       );
+      //     },
+      //   ),
+      // ),
+
+
+
+      // body: Container(
+      //   child: Column(
+      //     children: <Widget>[
+      //
+      //     ],
+      //   ),
+      // ),
+
 
 
     );
   }
+
+
 }
 
 
@@ -684,7 +861,6 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
 
   @override
   Widget build(BuildContext context) {
-
    return new Scaffold(
      appBar: new AppBar(
        title: new Text("Cart"),
@@ -693,7 +869,6 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
        child: FutureBuilder(
          future: _getCartList(),
          builder: (BuildContext context, AsyncSnapshot snapshot){
-
            if(snapshot.data == null){
              return Container(
                 child: Center(
@@ -917,7 +1092,7 @@ void RemoveItem(GUID) async {
     print(value);
   });
 }
-//ADD CART VALUE INOT ORDER LIST
+//ADD CART VALUE INTO ORDER LIST
   void sendDataToOrderList(sCart) async{
     Dio dio = new Dio();
     Future postData() async {

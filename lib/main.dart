@@ -127,16 +127,12 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   int _count = 1;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title:Text(widget.item.Description),
       ),
-
-
-
       body: Container(
         child:Container(
           child: Column(
