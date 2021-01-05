@@ -398,6 +398,7 @@ class _SignUpState extends State<SignUp> {
 
 //USER INFORMATION MODEL
 class UserInformation {
+   String GUID;
    String Name;
    String Password;
    String Address1;
@@ -405,10 +406,10 @@ class UserInformation {
    String PhoneNo;
    String Email;
 
-  UserInformation(this.Name, this.Password, this.Address1, this.Gender, this.PhoneNo, this.Email);
-
+  UserInformation(this.GUID,this.Name, this.Password, this.Address1, this.Gender, this.PhoneNo, this.Email);
 
   UserInformation.fromJson(Map<String, dynamic>json){
+    GUID = json["GUID"];
     Name = json["Name"];
     Password = json["Password"];
     Address1 = json["Address1"];
@@ -418,6 +419,7 @@ class UserInformation {
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['GUID'] = this.GUID;
     data['Name'] = this.Name;
     data['Password'] = this.Password;
     data['Address1'] = this.Address1;
@@ -447,7 +449,13 @@ class _UserProfileState extends State<UserProfile>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("profile")),
+      appBar: AppBar(title: Text("profile"),
+        actions: <Widget>[
+           new IconButton(icon: Icon(Icons.add_shopping_cart), onPressed: (){
+            Navigator.push(context, new MaterialPageRoute(builder: (context)=>ViewShoppingCart()));
+        }),
+    ],),
+
         body: ListView(
           children: <Widget>[
             FutureBuilder(
@@ -507,14 +515,20 @@ class DetailPage extends StatefulWidget{
 
 class _DetailPageState extends State<DetailPage> {
   int _count = 1;
+
+
   //POST METHOD
   Dio dio = new Dio();
   Future postData() async {
+    var email = await FlutterSession().get("GUID");
+    var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+    UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
+    var GUID = u.GUID;
     final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CreateCartAPI.php";
     var cList;
     dynamic data = {
       "ItemCode":widget.cList.ItemCode,
-      "UserID":"U12",
+      "UserID":GUID,
       "Variation":"S,L,M",
       "Quantity":2,
       "GST": 0,
@@ -528,7 +542,7 @@ class _DetailPageState extends State<DetailPage> {
     ));
     return response.data;
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
