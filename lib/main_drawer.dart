@@ -431,47 +431,18 @@ class UserInformation {
 }
 
 class UserProfile extends StatefulWidget{
-
-
   @override
   _UserProfileState createState() => _UserProfileState();
 }
 
 class _UserProfileState extends State<UserProfile>{
 
-  // Future<List<UserInformation>>  _getUserInformation() async{
-  //   var email = await FlutterSession().get("GUID");
-  //   var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
-  //   //var jsonData = jsonDecode(data.body);
-  //
-  //   UserInformation uInfo = UserInformation.fromJson((jsonDecode(data.body)));
-  //
-  //   // List<UserInformation> userInformation = [];
-  //   // for (var u in jsonData){
-  //   //   UserInformation uInfo = UserInformation(u["Name"],u["Password"],u["Address1"],u["Gender"],u["PhoneNo"],u["Email"]);
-  //   //   userInformation.add(uInfo);
-  //   // }
-  //   // //print(UserInformation);
-  //   //return userInformation;
-  // }
-  //
-  // //  _getUserInformation() async{
-  // //   var email = await FlutterSession().get("GUID");
-  // //   var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
-  // //   var jsonData = jsonDecode(data.body);
-  // //   print(jsonData);
-  // // }
-
-
-
   getUserInfo() async{
     var email = await FlutterSession().get("GUID");
     var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
     UserInformation u = UserInformation.fromJson(jsonDecode(data.body));
-    //print(u.Email);
     return u;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -514,93 +485,18 @@ class _UserProfileState extends State<UserProfile>{
                           TextField(
                               decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: snapshot.data.Address1??'---------')
                           ),
-
-
-
-
                         ],
                       ),
                     );
                   }
-                 // _getUserInformation();
-                  //getUserInfo();
-                  //return Text(snapshot.hasData ? snapshot.data: 'Loading....');
                 })
           ],
         )
-
-      // body: Container(
-      //   child: FutureBuilder(
-      //     future: getUserInfo(),
-      //     builder: (BuildContext context, AsyncSnapshot snapshot){
-      //       if(snapshot.data == null){
-      //         return Container(
-      //           child: Center(
-      //             child: Text("Loading..."),
-      //           ),
-      //         );
-      //       } else{
-      //         return Container(
-      //           child: ListView.builder(
-      //             //padding: EdgeInsets.all(10),
-      //
-      //               itemBuilder: (BuildContext context, int index){
-      //                 final x = snapshot.data[index];
-      //
-      //                 return ListTile(
-      //                   leading: Text(snapshot.data[index].Name),
-      //
-      //                   title:  Text(snapshot.data[index].Name),
-      //                   subtitle: Row(
-      //                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-      //                     children: <Widget>[
-      //                       Text(snapshot.data[index].Name),
-      //                       Text(snapshot.data[index].Name),
-      //
-      //
-      //                     ],
-      //                   ),
-      //                 );
-      //               }),
-      //         );
-      //       }
-      //     },
-      //   ),
-      // ),
-      //
-
-
-
-      // body: Container(
-      //   child: FutureBuilder(
-      //     future: getUserInfo(),
-      //     builder: (BuildContext context, AsyncSnapshot snapshot){
-      //       return ListTile(
-      //         title: Text(snapshot.data[index].Name),
-      //       );
-      //     },
-      //   ),
-      // ),
-
-
-
-      // body: Container(
-      //   child: Column(
-      //     children: <Widget>[
-      //
-      //     ],
-      //   ),
-      // ),
-
-
-
     );
   }
 
 
 }
-
-
 
 class DetailPage extends StatefulWidget{
   final CategoryList cList;
@@ -632,7 +528,6 @@ class _DetailPageState extends State<DetailPage> {
     ));
     return response.data;
   }
-
   
   @override
   Widget build(BuildContext context) {
