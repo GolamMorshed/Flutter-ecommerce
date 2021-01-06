@@ -515,15 +515,15 @@ class DetailPage extends StatefulWidget{
 
 class _DetailPageState extends State<DetailPage> {
   int _count = 1;
-
-
   //POST METHOD
   Dio dio = new Dio();
   Future postData() async {
+    //GET LOGIN USER INFO
     var email = await FlutterSession().get("GUID");
     var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
     UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
     var GUID = u.GUID;
+
     final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CreateCartAPI.php";
     var cList;
     dynamic data = {
