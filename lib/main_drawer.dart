@@ -1037,22 +1037,31 @@ void RemoveItem(GUID) async {
 }
 //ADD CART VALUE INTO ORDER LIST
   void sendDataToOrderList(sCart) async{
+    //GET LOGIN USER INFORMATION
+    var email = await FlutterSession().get("GUID");
+    var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+    UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
+    var UserID = u.GUID;
+    var UserName = u.Name;
+    var UserPhoneNo = u.PhoneNo;
+    var Address1 = u.Address1;
+
     Dio dio = new Dio();
     Future postData() async {
       final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Order/CreateOrderAPI.php";
       dynamic data = {
-        "Name": sCart.Variation,
-        "PhoneNo": "775617",
+        "Name": UserName,
+        "PhoneNo": UserPhoneNo,
         "HouseNo": "11-07",
-        "Address1": "address1",
+        "Address1": Address1,
         "Address2": "address2",
         "Address3": "address3",
         "Address4": "address4",
         "PostCode": "94300",
         "City": "test",
         "State":"Sarawak",
-        "Variation": "S",
-        "Variation1": "S",
+        "Variation": sCart.Variation,
+        "Variation1": "Variation1",
         "Variation2": "L",
         "Variation3": "Yellow",
         "Variation4": "Red",
