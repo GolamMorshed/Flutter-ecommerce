@@ -748,9 +748,17 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
     this._getCartList();
   }
   Future<List<ShoppingCart>> _getCartList() async{
+    //GET LOGIN USER INFORMATION
+    var email = await FlutterSession().get("GUID");
+    var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+    UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
+    var GUID = u.GUID;
+
+
     var Total = [];
     var sum;
-    var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartListAPI.php");
+    //var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartListAPI.php");
+    var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartUserIDListAPI.php?UserID="+GUID);
     var jsonData = json.decode(data.body);
     List<ShoppingCart> cartList = [];
     for(var i in jsonData["body"]){
@@ -761,7 +769,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
     int t = 0;
     for(var a = 0; a < Total.length; a++){
      int price = int.parse(Total[a].toString());
-     print(t+price);
+     //print(t+price);
      t = t + price;
     }
     sumOfPrice = t.toString();
@@ -781,7 +789,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
            if(snapshot.data == null){
              return Container(
                 child: Center(
-                  child: Text("Loading..."),
+                  child: Text("Cart is empty.."),
                 ),
              );
            } else{
@@ -910,6 +918,12 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
   }
 
   void plusQuantity(GUID,Quantity,Price) async{
+    //GET LOGIN USER INFORMATION
+    var email = await FlutterSession().get("GUID");
+    var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+    UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
+    var UserID = u.GUID;
+
     int q = int.parse(Quantity.toString());
     int price = int.parse(Price.toString());
     int q1 = q + 1;
@@ -920,6 +934,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
       final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/UpdateQuantityAPI.php";
       dynamic data = {
         "GUID":GUID,
+        "UserID":UserID,
         "Quantity":q1,
         "Price": p
       };
@@ -936,9 +951,16 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
   }
 
   void addToOrder() async{
+    //GET LOGIN USER INFORMATION
+    var email = await FlutterSession().get("GUID");
+    var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+    UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
+    var UserID = u.GUID;
+    
+
     //GET DATA FORM REQUEST
     Future<List<ShoppingCart>> _getCartList() async{
-      var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartListAPI.php");
+      var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartUserIDListAPI.php?UserID="+UserID);
       var jsonData = json.decode(data.body);
         for(var i in jsonData["body"]){
           ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"]);
@@ -953,6 +975,11 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
 }
 //PLUS QUANTITY
 void minusQuantity(GUID, Quantity, Price) async{
+  //GET LOGIN USER INFORMATION
+  var email = await FlutterSession().get("GUID");
+  var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+  UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
+  var UserID = u.GUID;
   print(GUID);
   int q = int.parse(Quantity.toString());
   int price = int.parse(Price.toString());
@@ -964,6 +991,7 @@ void minusQuantity(GUID, Quantity, Price) async{
     final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/UpdateQuantityAPI.php";
     dynamic data = {
       "GUID":GUID,
+      "UserID":UserID,
       "Quantity":q1,
       "Price":p
     };
@@ -983,12 +1011,18 @@ void minusQuantity(GUID, Quantity, Price) async{
 
 //MINUS QUANTITY
 void RemoveItem(GUID) async {
-  print(GUID);
+  //GET LOGIN USER INFORMATION
+  var email = await FlutterSession().get("GUID");
+  var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+  UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
+  var UserID = u.GUID;
+
   Dio dio = new Dio();
   Future deleteItem() async {
     final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/DeleteItemAPI.php";
     dynamic data = {
-      "GUID": GUID
+      "GUID": GUID,
+      "UserID": UserID
     };
     var response = await dio.post(url, data: data, options: Options(
         headers: {
