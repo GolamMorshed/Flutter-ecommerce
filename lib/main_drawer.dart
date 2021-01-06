@@ -144,8 +144,9 @@ class CategoryList {
   final String Image2;
   final String Image3;
   final String Image4;
+  final String Price;
   final String UserMememberNo;
-  CategoryList(this.ItemCode,this.ItemModel,this.Image,this.UserMememberNo, this.Description, this.Image1, this.Image2, this.Image3, this.Image4);
+  CategoryList(this.ItemCode,this.ItemModel,this.Image,this.UserMememberNo, this.Description, this.Image1, this.Image2, this.Image3, this.Image4,this.Price);
 
 }
 
@@ -163,7 +164,7 @@ class _ViewCategoryState extends State<ViewCategory> {
    var jsonData =json.decode(data.body);
    List<CategoryList> cList = [];
    for(var i in jsonData) {
-     CategoryList cate = CategoryList(i["ItemCode"],i["ItemModel"],i["Image"],i["UserMememberNo"],i["Image1"],i["Image2"],i["Image3"],i["Image4"],i["Description"]);
+     CategoryList cate = CategoryList(i["ItemCode"],i["ItemModel"],i["Image"],i["UserMememberNo"],i["Image1"],i["Image2"],i["Image3"],i["Image4"],i["Description"],i["Price"]);
      cList.add(cate);
    }
    return cList;
@@ -530,9 +531,10 @@ class _DetailPageState extends State<DetailPage> {
       "ItemCode":widget.cList.ItemCode,
       "UserID":GUID,
       "Variation":"S,L,M",
-      "Quantity":2,
+      "Quantity":1,
       "GST": 0,
-      "Price":3,
+      "OriPrice": widget.cList.Price,
+      "Price":widget.cList.Price,
       "DeliveryCharge": 5
     };
     var response = await dio.post(url,data: data,options: Options(
@@ -612,7 +614,7 @@ class _DetailPageState extends State<DetailPage> {
                 child: SizedBox(
                   child: Row(
                     children: <Widget>[
-                      Text("Price: RM12",style: TextStyle(
+                      Text(widget.cList.Price ?? 'No Price added',style: TextStyle(
                         fontSize:30,
                       ),),
                     ],
@@ -731,8 +733,9 @@ class ShoppingCart {
   final String Variation;
   final String Quantity;
   final String Price;
+  final String OriPrice;
   final String GUID;
-  ShoppingCart(this.Description,this.UserMememberNo, this.Image, this.Variation, this.Quantity, this.Price,this.GUID);
+  ShoppingCart(this.Description,this.UserMememberNo, this.Image, this.Variation, this.Quantity, this.Price,this.GUID,this.OriPrice);
 }
 
 class ViewShoppingCart extends StatefulWidget{
@@ -753,8 +756,6 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
     var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
     UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
     var GUID = u.GUID;
-
-
     var Total = [];
     var sum;
     //var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartListAPI.php");
@@ -762,7 +763,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
     var jsonData = json.decode(data.body);
     List<ShoppingCart> cartList = [];
     for(var i in jsonData["body"]){
-      ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"]);
+      ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"],i["OriPrice"]);
       cartList.add(sCart);
       Total.add(sCart.Price);
     }
@@ -844,7 +845,8 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
                              child:OutlineButton(
                                onPressed: (){
                                  plusQuantity(snapshot.data[index].GUID,
-                                     snapshot.data[index].Quantity,snapshot.data[index].Price);
+                                     snapshot.data[index].Quantity,
+                                     snapshot.data[index].Price);
                                  setState(() {
                                    _count++;
                                  });
@@ -918,6 +920,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
   }
 
   void plusQuantity(GUID,Quantity,Price) async{
+    //print(Price);
     //GET LOGIN USER INFORMATION
     var email = await FlutterSession().get("GUID");
     var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
@@ -948,6 +951,9 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
     await updateQuantity().then((value){
       print(value);
     });
+    setState(() {
+      _getCartList();
+    });
   }
 
   void addToOrder() async{
@@ -963,7 +969,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
       var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartUserIDListAPI.php?UserID="+UserID);
       var jsonData = json.decode(data.body);
         for(var i in jsonData["body"]){
-          ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"]);
+          ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"],i["OriPrice"]);
           sendDataToOrderList(sCart);
         }
     }
@@ -972,19 +978,26 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
       initState();
     });
 
+
 }
-//PLUS QUANTITY
+//MINUS QUANTITY
 void minusQuantity(GUID, Quantity, Price) async{
   //GET LOGIN USER INFORMATION
   var email = await FlutterSession().get("GUID");
   var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
   UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
   var UserID = u.GUID;
-  print(GUID);
+
   int q = int.parse(Quantity.toString());
   int price = int.parse(Price.toString());
-  int q1 = q - 1;
-  int p = q1 * price;
+  int p,q1;
+
+  if(q == 0){
+    q = 1;
+  }
+    q1 = q - 1;
+    p = q1 * price;
+
 
   Dio dio = new Dio();
   Future updateQuantity() async{
@@ -1007,6 +1020,10 @@ void minusQuantity(GUID, Quantity, Price) async{
     print(value);
     initState();
   });
+  setState(() {
+    _getCartList();
+  });
+
 }
 
 //MINUS QUANTITY
@@ -1033,6 +1050,9 @@ void RemoveItem(GUID) async {
   }
   await deleteItem().then((value) {
     print(value);
+  });
+  setState(() {
+    _getCartList();
   });
 }
 //ADD CART VALUE INTO ORDER LIST
