@@ -747,8 +747,8 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
   var sumOfPrice;
   @override
   void initState(){
-    super.initState();
-    this._getCartList();
+    // super.initState();
+    // this._getCartList();
   }
   Future<List<ShoppingCart>> _getCartList() async{
     //GET LOGIN USER INFORMATION
@@ -819,14 +819,6 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
                                  minusQuantity(snapshot.data[index].GUID,
                                      snapshot.data[index].Quantity,
                                      snapshot.data[index].OriPrice);
-                                 setState(() {
-                                   if(_count <= 1)
-                                   {
-                                     _count = 1;
-                                   }
-                                   _count--;
-                                 });
-
                                },
                                padding: EdgeInsets.zero,
                                child: Icon(Icons.remove),
