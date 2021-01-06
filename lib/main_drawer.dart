@@ -817,7 +817,8 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
                              child:OutlineButton(
                                onPressed: (){
                                  minusQuantity(snapshot.data[index].GUID,
-                                     snapshot.data[index].Quantity, snapshot.data[index].Price);
+                                     snapshot.data[index].Quantity,
+                                     snapshot.data[index].OriPrice);
                                  setState(() {
                                    if(_count <= 1)
                                    {
@@ -846,7 +847,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
                                onPressed: (){
                                  plusQuantity(snapshot.data[index].GUID,
                                      snapshot.data[index].Quantity,
-                                     snapshot.data[index].Price);
+                                     snapshot.data[index].OriPrice);
                                  setState(() {
                                    _count++;
                                  });
@@ -859,9 +860,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
                          ),
                          OutlineButton(
                            onPressed: () {
-
                              var GUID =snapshot.data[index].GUID;
-                             //print(snapshot.data[index].GUID);
                              RemoveItem(GUID);
                            },
                            child: Text('Remove'),
@@ -902,7 +901,6 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
           ],
         ),
       ),
-
        height: 174,
        decoration: BoxDecoration(
          color: Colors.white,
@@ -919,7 +917,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
    );
   }
 
-  void plusQuantity(GUID,Quantity,Price) async{
+  void plusQuantity(GUID,Quantity,OriPrice) async{
     //print(Price);
     //GET LOGIN USER INFORMATION
     var email = await FlutterSession().get("GUID");
@@ -928,7 +926,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
     var UserID = u.GUID;
 
     int q = int.parse(Quantity.toString());
-    int price = int.parse(Price.toString());
+    int price = int.parse(OriPrice.toString());
     int q1 = q + 1;
     int p = q1 * price;
 
@@ -962,8 +960,6 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
     var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
     UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
     var UserID = u.GUID;
-    
-
     //GET DATA FORM REQUEST
     Future<List<ShoppingCart>> _getCartList() async{
       var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartUserIDListAPI.php?UserID="+UserID);
@@ -981,7 +977,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
 
 }
 //MINUS QUANTITY
-void minusQuantity(GUID, Quantity, Price) async{
+void minusQuantity(GUID, Quantity, OriPrice) async{
   //GET LOGIN USER INFORMATION
   var email = await FlutterSession().get("GUID");
   var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
@@ -989,15 +985,11 @@ void minusQuantity(GUID, Quantity, Price) async{
   var UserID = u.GUID;
 
   int q = int.parse(Quantity.toString());
-  int price = int.parse(Price.toString());
+  int price = int.parse(OriPrice.toString());
   int p,q1;
 
-  if(q == 0){
-    q = 1;
-  }
     q1 = q - 1;
     p = q1 * price;
-
 
   Dio dio = new Dio();
   Future updateQuantity() async{
@@ -1015,10 +1007,8 @@ void minusQuantity(GUID, Quantity, Price) async{
     ));
     return response.data;
   }
-
   await updateQuantity().then((value){
     print(value);
-    initState();
   });
   setState(() {
     _getCartList();
