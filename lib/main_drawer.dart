@@ -212,7 +212,7 @@ class _ViewCategoryState extends State<ViewCategory> {
                         height:150.0,
                         fit:BoxFit.cover),
                           Text(x.UserMememberNo),
-                          Text("Price: RM:134"),
+                          Text(x.Price),
                         ],
                       ),
                     ),
@@ -257,13 +257,14 @@ class _LoginPageState extends State<LoginPage> {
              Column(
                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                children: <Widget>[
+
                  TextField(
                    controller: email,
-                   decoration:  InputDecoration(prefixIcon: Icon(Icons.account_box)),
+                   decoration:  InputDecoration(prefixIcon: Icon(Icons.email),hintText: "Email"),
                  ),
                  TextField(
                    controller: password,
-                  decoration: InputDecoration(prefixIcon: Icon(Icons.lock)),
+                  decoration: InputDecoration(prefixIcon: Icon(Icons.lock),hintText: "Password"),
                  ),
                  MaterialButton(onPressed: (){
                    UserLogin();
@@ -305,10 +306,13 @@ class SignUp extends StatefulWidget{
 }
 
 class _SignUpState extends State<SignUp> {
-  TextEditingController registration_email, registration_password;
+  TextEditingController name,phone_no,address,registration_email, registration_password;
   @override
   void initState(){
     super.initState();
+    name = new TextEditingController();
+    phone_no = new TextEditingController();
+    address = new TextEditingController();
     registration_email = new TextEditingController();
     registration_password = new TextEditingController();
 
@@ -327,12 +331,25 @@ class _SignUpState extends State<SignUp> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   TextField(
+                    controller: name,
+                    decoration:  InputDecoration(prefixIcon: Icon(Icons.account_box),hintText: "Name"),
+
+                  ),
+                  TextField(
+                    controller: phone_no,
+                    decoration:  InputDecoration(prefixIcon: Icon(Icons.phone),hintText: "Phone No"),
+                  ),
+                  TextField(
                     controller: registration_email,
-                    decoration:  InputDecoration(prefixIcon: Icon(Icons.account_box)),
+                    decoration:  InputDecoration(prefixIcon: Icon(Icons.email),hintText: "Email"),
+                  ),
+                  TextField(
+                    controller: address,
+                    decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: "Address"),
                   ),
                   TextField(
                     controller: registration_password,
-                    decoration: InputDecoration(prefixIcon: Icon(Icons.lock)),
+                    decoration: InputDecoration(prefixIcon: Icon(Icons.lock),hintText: "Password"),
                   ),
                   MaterialButton(onPressed: (){
                     UserRegistration();
@@ -365,6 +382,9 @@ class _SignUpState extends State<SignUp> {
       }else{
         var url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Login_Registration/registration.php";
         var response = await http.post(url,body:{
+          "name": name.text,
+          "phone_no": phone_no.text,
+          "address": address.text,
           "email":registration_email.text,
           "password":registration_password.text,
         });
@@ -758,7 +778,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
     var GUID = u.GUID;
     var Total = [];
     var sum;
-    //var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartListAPI.php");
+
     var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartUserIDListAPI.php?UserID="+GUID);
     var jsonData = json.decode(data.body);
     List<ShoppingCart> cartList = [];
@@ -1048,6 +1068,7 @@ void RemoveItem(GUID) async {
     var UserPhoneNo = u.PhoneNo;
     var Address1 = u.Address1;
 
+
     Dio dio = new Dio();
     Future postData() async {
       final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Order/CreateOrderAPI.php";
@@ -1063,11 +1084,11 @@ void RemoveItem(GUID) async {
         "City": "test",
         "State":"Sarawak",
         "Variation": sCart.Variation,
-        "Variation1": "Variation1",
-        "Variation2": "L",
-        "Variation3": "Yellow",
-        "Variation4": "Red",
-        "Price":"2",
+        "Variation1": "---",
+        "Variation2": "---",
+        "Variation3": "---",
+        "Variation4": "---",
+        "Price":sCart.Price,
         "DeliveryCost": "7",
         "Quantity":"2",
         "DeliveryDate":"12/12/2020",
