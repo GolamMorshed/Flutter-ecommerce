@@ -402,20 +402,29 @@ class UserInformation {
    String Name;
    String Password;
    String Address1;
+   String Address2;
+   String Address3;
+   String Address4;
    String Gender;
    String PhoneNo;
    String Email;
+   String PostCode;
 
-  UserInformation(this.GUID,this.Name, this.Password, this.Address1, this.Gender, this.PhoneNo, this.Email);
+
+  UserInformation(this.GUID,this.Name, this.Password, this.Address1,this.Address2, this.Address3,this.Address4, this.Gender, this.PhoneNo, this.Email, this.PostCode);
 
   UserInformation.fromJson(Map<String, dynamic>json){
     GUID = json["GUID"];
     Name = json["Name"];
     Password = json["Password"];
     Address1 = json["Address1"];
+    Address2 = json["Address2"];
+    Address3 = json["Address3"];
+    Address4 = json["Address4"];
     Gender = json["Gender"];
     PhoneNo = json["PhoneNo"];
     Email = json["Email"];
+    PostCode = json["PostCode"];
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -423,6 +432,9 @@ class UserInformation {
     data['Name'] = this.Name;
     data['Password'] = this.Password;
     data['Address1'] = this.Address1;
+    data['Address2'] = this.Address2;
+    data['Address3'] = this.Address3;
+    data['Address4'] = this.Address4;
     data['Gender'] = this.Gender;
     data['PhoneNo'] = this.PhoneNo;
     data['Email'] = this.Email;
@@ -732,7 +744,8 @@ class ShoppingCart {
   final String Quantity;
   final String Price;
   final String GUID;
-  ShoppingCart(this.Description,this.UserMememberNo, this.Image, this.Variation, this.Quantity, this.Price,this.GUID);
+  final String ItemCode;
+  ShoppingCart(this.Description,this.UserMememberNo, this.Image, this.Variation, this.Quantity, this.Price,this.GUID,this.ItemCode);
 }
 
 class ViewShoppingCart extends StatefulWidget{
@@ -762,7 +775,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
     var jsonData = json.decode(data.body);
     List<ShoppingCart> cartList = [];
     for(var i in jsonData["body"]){
-      ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"]);
+      ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"],i["ItemCode"]);
       cartList.add(sCart);
       Total.add(sCart.Price);
     }
@@ -963,7 +976,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
       var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartUserIDListAPI.php?UserID="+UserID);
       var jsonData = json.decode(data.body);
         for(var i in jsonData["body"]){
-          ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"]);
+          ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"],i["ItemCode"]);
           sendDataToOrderList(sCart);
         }
     }
@@ -1035,33 +1048,112 @@ void RemoveItem(GUID) async {
     print(value);
   });
 }
-//ADD CART VALUE INTO ORDER LIST
+    //ADD CART VALUE INTO ORDER LIST
   void sendDataToOrderList(sCart) async{
+
+    //GET LOGIN USER INFORMATION
+    var email = await FlutterSession().get("GUID");
+    var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+    UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
+
+    var GUID = u.GUID;
+    var Name = u.Name;
+    var PhoneNo = u.PhoneNo;
+    var Address1 = u.Address1;
+    var Address2 = u.Address2;
+    var Address3 = u.Address3;
+    var Address4 = u.Address4;
+    var PostCode = u.PostCode;
+
+
+
+    var Total = [];
+    var ItemCode = [];
+    var data = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Cart/CartUserIDListAPI.php?UserID="+GUID);
+    var jsonData = json.decode(data.body);
+    List<ShoppingCart> cartList = [];
+    for(var i in jsonData["body"]){
+      ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"],i["ItemCode"]);
+      //cartList.add(sCart);
+      Total.add(sCart.Price);
+      ItemCode.add(sCart.ItemCode);
+    }
+    int t = 0;
+    for(var a = 0; a < Total.length; a++){
+      int price = int.parse(Total[a].toString());
+      //print(t+price);
+      t = t + price;
+    }
+
+
+
+
     Dio dio = new Dio();
     Future postData() async {
-      final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Order/CreateOrderAPI.php";
+      //final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Order/CrebateOrderAPI.php";
+
+      final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Order/MakeTest.php";
+
+      // dynamic data = {
+      //   "Name": sCart.Variation,
+      //   "PhoneNo": "775617",
+      //   "HouseNo": "11-07",
+      //   "Address1": "address1",
+      //   "Address2": "address2",
+      //   "Address3": "address3",
+      //   "Address4": "address4",
+      //   "PostCode": "94300",
+      //   "City": "test",
+      //   "State":"Sarawak",
+      //   "Variation": "S",
+      //   "Variation1": "S",
+      //   "Variation2": "L",
+      //   "Variation3": "Yellow",
+      //   "Variation4": "Red",
+      //   "Price":"2",
+      //   "DeliveryCost": "7",
+      //   "Quantity":"2",
+      //   "DeliveryDate":"12/12/2020",
+      //   "OrderStatus":"Active"
+      // };
+
+
       dynamic data = {
-        "Name": sCart.Variation,
-        "PhoneNo": "775617",
-        "HouseNo": "11-07",
-        "Address1": "address1",
-        "Address2": "address2",
-        "Address3": "address3",
-        "Address4": "address4",
-        "PostCode": "94300",
-        "City": "test",
-        "State":"Sarawak",
-        "Variation": "S",
-        "Variation1": "S",
-        "Variation2": "L",
-        "Variation3": "Yellow",
-        "Variation4": "Red",
-        "Price":"2",
-        "DeliveryCost": "7",
-        "Quantity":"2",
-        "DeliveryDate":"12/12/2020",
-        "OrderStatus":"Active"
+        "TotalPrice": Total,
+        "OrderStatus": "active",
+        "DeliveryAddress1": "Delivery",
+        "DeliveryAddress2": "Delivery",
+        "DeliveryAddress3": "Delivery",
+        "DeliveryAddress4": "Delivery",
+        "DeliveryAddress5": "Delivery",
+        "DeliveryCity": "kuching",
+        "DeliveryPostCode": "94300",
+        "DeliveryState": "k",
+
+        "BuyerName": Name,
+        "BuyerPhoneNo": PhoneNo,
+        "BuyerAddress1": Address1,
+        "BuyerAddress2": Address2,
+        "BuyerAddress3": Address3,
+        "BuyerAddress4": Address4,
+        "BuyerAddress5": "BuyerAddress1",
+        "BuyerPostCode": PostCode,
+        "BuyerCity": "kuching",
+        "BuyerState": "sarawak",
+
+
+        "ItemGUID": "asjhhuebbb-12",
+        "ItemName": "Foood",
+        "ItemPrice": "4",
+        "ItemQuantity": "3",
+        "ItemVariation1": "ItemVariation1",
+        "ItemVariation2": "ItemVariation2",
+        "ItemVariation3": "ItemVariation3",
+        "ItemVariation4": "ItemVariation4",
+        "ItemVariation5": "ItemVariation5",
+        "ItemIDs":ItemCode
       };
+
       var response = await dio.post(url,data: data,options: Options(
           headers: {
             'Content-type': 'application/json; charset=UTF-8',
