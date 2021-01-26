@@ -1061,6 +1061,7 @@ class _ViewShoppingCartState extends State<ViewShoppingCart> {
                              var GUID =snapshot.data[index].GUID;
                              //print(snapshot.data[index].GUID);
                              RemoveItem(GUID);
+                             _getCartList();
                            },
                            child: Text('Remove'),
                          ),
@@ -1233,6 +1234,22 @@ void RemoveItem(GUID) async {
   }
   await deleteItem().then((value) {
     print(value);
+    var successAlert = "Item deleted.";
+    if(value == successAlert){
+      setState(() {
+        _getCartList();
+      });
+      Fluttertoast.showToast(
+          msg: "Item deleted",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 5,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+    }
+
   });
 }
     //ADD CART VALUE INTO ORDER LIST
