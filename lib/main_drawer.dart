@@ -379,10 +379,11 @@ class _SignUpState extends State<SignUp> {
       }else{
         var url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Login_Registration/registration.php";
         var response = await http.post(url,body:{
-          "name": registration_name.toString(),
-          "phone_no": registration_phone_no.toString(),
-          "email":registration_email.text.toString(),
-          "password":registration_password.text.toString(),
+          "name": registration_name.text,
+          "phone_no": registration_phone_no.text,
+          "address": registration_address.text,
+          "email":registration_email.text,
+          "password":registration_password.text,
         });
 
         var data = json.decode(response.body);
