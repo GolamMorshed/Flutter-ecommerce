@@ -427,9 +427,11 @@ class UserInformation {
    String PhoneNo;
    String Email;
    String PostCode;
+   String Race;
+   String DOB;
 
 
-  UserInformation(this.GUID,this.Name, this.Password, this.Address1,this.Address2, this.Address3,this.Address4, this.Gender, this.PhoneNo, this.Email, this.PostCode);
+  UserInformation(this.GUID,this.Name, this.Password, this.Address1,this.Address2, this.Address3,this.Address4, this.Gender, this.PhoneNo, this.Email, this.PostCode,this.Race,this.DOB);
 
   UserInformation.fromJson(Map<String, dynamic>json){
     GUID = json["GUID"];
@@ -443,6 +445,8 @@ class UserInformation {
     PhoneNo = json["PhoneNo"];
     Email = json["Email"];
     PostCode = json["PostCode"];
+    Race = json["Race"];
+    DOB = json["DOB"];
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -456,6 +460,8 @@ class UserInformation {
     data['Gender'] = this.Gender;
     data['PhoneNo'] = this.PhoneNo;
     data['Email'] = this.Email;
+    data['Race'] = this.Race;
+    data['DOB'] = this.DOB;
     return data;
   }
 
@@ -468,6 +474,32 @@ class UserProfile extends StatefulWidget{
 }
 
 class _UserProfileState extends State<UserProfile>{
+
+
+  TextEditingController name,email,password,address1,address2,address3,address4,phone_no,post_code,city,state,DOB,gender,race;
+
+
+  @override
+  void initState(){
+    super.initState();
+    name = new TextEditingController();
+    email = new TextEditingController();
+    password = new TextEditingController();
+    address1 = new TextEditingController();
+    address2 = new TextEditingController();
+    address3 = new TextEditingController();
+    address4 = new TextEditingController();
+    post_code = new TextEditingController();
+    city = new TextEditingController();
+    state = new TextEditingController();
+    DOB = new TextEditingController();
+    gender = new TextEditingController();
+    race = new TextEditingController();
+    phone_no = new TextEditingController();
+
+
+  }
+
 
   getUserInfo() async{
     var email = await FlutterSession().get("GUID");
@@ -506,36 +538,62 @@ class _UserProfileState extends State<UserProfile>{
                             image: NetworkImage('https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
                           ),
                           TextField(
-                            decoration:  InputDecoration(prefixIcon: Icon(Icons.account_box),hintText: snapshot.data.Name??'-------')
+                              controller: name,
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.account_box),hintText: snapshot.data.Name??'-------')
                           ),
+
                           TextField(
+                              controller: email,
                               decoration:  InputDecoration(prefixIcon: Icon(Icons.email),hintText: snapshot.data.Email??'-------')
                           ),
                           TextField(
-                              decoration:  InputDecoration(prefixIcon: Icon(Icons.lock),hintText: snapshot.data.Password??'-------')
+                              controller: password,
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.email),hintText: snapshot.data.Password??'-------')
                           ),
+                          // TextField(
+                          //     controller: password,
+                          //     decoration:  InputDecoration(prefixIcon: Icon(Icons.lock),hintText: snapshot.data.Password??'-------')
+                          // ),
                           TextField(
+                              controller: gender,
                               decoration:  InputDecoration(prefixIcon: Icon(Icons.accessibility),hintText: snapshot.data.Gender??'---------')
                           ),
                           TextField(
+                              controller: phone_no,
                               decoration:  InputDecoration(prefixIcon: Icon(Icons.add_ic_call_sharp),hintText: snapshot.data.PhoneNo??'---------')
                           ),
                           TextField(
+                              controller: race,
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.accessibility_sharp),hintText: snapshot.data.Race??'---------')
+                          ),
+                          TextField(
+                              controller: DOB,
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.date_range_rounded),hintText: snapshot.data.DOB??'DD/MM/YYYY')
+                          ),
+                          TextField(
+                              controller: address1,
                               decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: snapshot.data.Address1??'---------')
                           ),
                           TextField(
+                              controller: address2,
                               decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: snapshot.data.Address2??'---------')
                           ),
                           TextField(
+                              controller: address3,
                               decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: snapshot.data.Address3??'---------')
                           ),
                           TextField(
+                              controller: address4,
                               decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: snapshot.data.Address4??'---------')
                           ),
+                          TextField(
+                              controller: post_code,
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: snapshot.data.PostCode??'PostCode')
+                          ),
+
                           RaisedButton(
                             onPressed: () => {
-                              //do something
-                             // UpdateProfile();
+                              UpdateProfile()
 
                             },
                             child: new Text('Update'),
@@ -550,18 +608,51 @@ class _UserProfileState extends State<UserProfile>{
     );
   }
 
-  UpdateProfile() {
+  UpdateProfile() async {
     Dio dio = new Dio();
-    postData() async {
+    Future postData() async {
       //GET LOGIN USER INFO
       var email = await FlutterSession().get("GUID");
       var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
       UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
-      var GUID = u.GUID;
+
 
       final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/UpdateUserAPI.php";
+      // if(name.text == ''|| password.text == ''|| address1.text ==''|| address2.text ==''
+      //     || address3.text ==''|| address4.text ==''|| post_code.text ==''|| race.text ==''
+      //     || gender.text ==''|| DOB.text ==''|| phone_no.text ==''){
+      //   dynamic data = {
+      //     "GUID":u.GUID,
+      //     "Name":snapshot.data.Name,
+      //     "Password":password.text,
+      //     "Email":email,
+      //     "Address1": address1.text,
+      //     "Address2": address2.text,
+      //     "Address3": address3.text,
+      //     "Address4": address4.text,
+      //     "PostCode": post_code.text,
+      //     "Race": race.text,
+      //     "Gender": gender.text,
+      //     "DOB":DOB.text,
+      //     "PhoneNo":phone_no.text,
+      //
+      //   };
+      // }
 
       dynamic data = {
+          "GUID":u.GUID,
+          "Name":name.text,
+          "Email":email,
+          "Password":password.text,
+          "Address1": address1.text,
+          "Address2": address2.text,
+          "Address3": address3.text,
+          "Address4": address4.text,
+          "PostCode": post_code.text,
+          "Race": race.text,
+          "Gender": gender.text,
+          "DOB":DOB.text,
+          "PhoneNo":phone_no.text,
 
       };
       var response = await dio.post(url,data: data,options: Options(
@@ -571,6 +662,21 @@ class _UserProfileState extends State<UserProfile>{
       ));
       return response.data;
     }
+    await postData().then((value){
+      print(value);
+      Fluttertoast.showToast(
+          msg: "Your data is updated.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 5,
+          backgroundColor: Colors.blue,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+
+
+    });
+
 
   }
 
