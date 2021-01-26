@@ -739,7 +739,9 @@ class _DetailPageState extends State<DetailPage> {
           'Content-type': 'application/json; charset=UTF-8',
         }
     ));
+
     return response.data;
+
   }
 
   @override
@@ -895,6 +897,18 @@ class _DetailPageState extends State<DetailPage> {
                         onPressed: () async{
                           await postData().then((value){
                             print(value);
+                            var msg = "cart-created";
+                            if(value == msg){
+                              Fluttertoast.showToast(
+                                  msg: "Item added to the cart",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.CENTER,
+                                  timeInSecForIosWeb: 5,
+                                  backgroundColor: Colors.blue,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0
+                              );
+                            }
                           });
                         },
                         color: Colors.blue,
