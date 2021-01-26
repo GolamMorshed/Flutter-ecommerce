@@ -664,17 +664,30 @@ class _UserProfileState extends State<UserProfile>{
     }
     await postData().then((value){
       print(value);
-      Fluttertoast.showToast(
-          msg: "Your data is updated.",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 5,
-          backgroundColor: Colors.blue,
-          textColor: Colors.white,
-          fontSize: 16.0
-      );
-
-
+      var successMsg = "updated";
+      var rejectMsg ="not-updated";
+      if(value == successMsg){
+        Fluttertoast.showToast(
+            msg: "Your data is updated.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 5,
+            backgroundColor: Colors.blue,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
+      if(value == rejectMsg){
+        Fluttertoast.showToast(
+            msg: "Sorry cannot update data. Please try later",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 5,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
     });
 
 
