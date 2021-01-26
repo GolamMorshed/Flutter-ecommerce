@@ -304,10 +304,16 @@ class SignUp extends StatefulWidget{
 }
 
 class _SignUpState extends State<SignUp> {
-  TextEditingController registration_email, registration_password;
+  TextEditingController registration_name,registration_address,registration_phone_no,registration_email, registration_password;
+
+
+
   @override
   void initState(){
     super.initState();
+    registration_name = new TextEditingController();
+    registration_address = new TextEditingController();
+    registration_phone_no = new TextEditingController();
     registration_email = new TextEditingController();
     registration_password = new TextEditingController();
 
@@ -326,17 +332,26 @@ class _SignUpState extends State<SignUp> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   TextField(
+                    controller: registration_name,
+                    decoration: InputDecoration(prefixIcon: Icon(Icons.lock)),
+                  ),
+                  TextField(
                     controller: registration_email,
-                    decoration:  InputDecoration(prefixIcon: Icon(Icons.account_box)),
+                    decoration:  InputDecoration(prefixIcon: Icon(Icons.email)),
                   ),
                   TextField(
                     controller: registration_password,
                     decoration: InputDecoration(prefixIcon: Icon(Icons.lock)),
                   ),
-                  MaterialButton(onPressed: (){
-                    UserRegistration();
-                  },child:Text("Sign In"),
+                  TextField(
+                    controller: registration_address,
+                    decoration: InputDecoration(prefixIcon: Icon(Icons.home_work)),
                   ),
+                  TextField(
+                    controller: registration_phone_no,
+                    decoration: InputDecoration(prefixIcon: Icon(Icons.phone)),
+                  ),
+
                   MaterialButton(onPressed: (){
                     UserRegistration();
                   },child:Text("Sign Up"),
@@ -351,9 +366,9 @@ class _SignUpState extends State<SignUp> {
   }
 
   void UserRegistration() async{
-      if(registration_email.text == '' || registration_password.text == ''){
+      if(registration_email.text == '' || registration_password.text == ''|| registration_name.text == ''|| registration_phone_no.text == ''){
         Fluttertoast.showToast(
-            msg: "Please fillup the email and password",
+            msg: "Please fill up all the details",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 5,
@@ -364,8 +379,10 @@ class _SignUpState extends State<SignUp> {
       }else{
         var url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/Login_Registration/registration.php";
         var response = await http.post(url,body:{
-          "email":registration_email.text,
-          "password":registration_password.text,
+          "name": registration_name.toString(),
+          "phone_no": registration_phone_no.toString(),
+          "email":registration_email.text.toString(),
+          "password":registration_password.text.toString(),
         });
 
         var data = json.decode(response.body);
@@ -505,6 +522,23 @@ class _UserProfileState extends State<UserProfile>{
                           TextField(
                               decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: snapshot.data.Address1??'---------')
                           ),
+                          TextField(
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: snapshot.data.Address2??'---------')
+                          ),
+                          TextField(
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: snapshot.data.Address3??'---------')
+                          ),
+                          TextField(
+                              decoration:  InputDecoration(prefixIcon: Icon(Icons.add_business),hintText: snapshot.data.Address4??'---------')
+                          ),
+                          RaisedButton(
+                            onPressed: () => {
+                              //do something
+                             // UpdateProfile();
+
+                            },
+                            child: new Text('Update'),
+                          ),
                         ],
                       ),
                     );
@@ -515,8 +549,34 @@ class _UserProfileState extends State<UserProfile>{
     );
   }
 
+  UpdateProfile() {
+    Dio dio = new Dio();
+    postData() async {
+      //GET LOGIN USER INFO
+      var email = await FlutterSession().get("GUID");
+      var fetchData = await http.get("https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/GetSingleUserEmailAPI.php?Email="+email);
+      UserInformation u = UserInformation.fromJson(jsonDecode(fetchData.body));
+      var GUID = u.GUID;
+
+      final String url = "https://thegreen.studio/ecommerce/E-CommerceAPI/E-CommerceAPI/AI_API_SERVER/Api/User/UpdateUserAPI.php";
+
+      dynamic data = {
+
+      };
+      var response = await dio.post(url,data: data,options: Options(
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+          }
+      ));
+      return response.data;
+    }
+
+  }
+
 
 }
+
+
 
 class DetailPage extends StatefulWidget{
   final CategoryList cList;
@@ -1074,7 +1134,7 @@ void RemoveItem(GUID) async {
     List<ShoppingCart> cartList = [];
     for(var i in jsonData["body"]){
       ShoppingCart sCart = ShoppingCart(i["Description"],i["UserMememberNo"],i["Image"],i["Variation"],i["Quantity"],i["Price"],i["GUID"],i["ItemCode"]);
-      //cartList.add(sCart);
+      cartList.add(sCart);
       Total.add(sCart.Price);
       ItemCode.add(sCart.ItemCode);
     }
@@ -1084,8 +1144,6 @@ void RemoveItem(GUID) async {
       //print(t+price);
       t = t + price;
     }
-
-
 
 
     Dio dio = new Dio();
@@ -1121,10 +1179,10 @@ void RemoveItem(GUID) async {
       dynamic data = {
         "TotalPrice": Total,
         "OrderStatus": "active",
-        "DeliveryAddress1": "Delivery",
-        "DeliveryAddress2": "Delivery",
-        "DeliveryAddress3": "Delivery",
-        "DeliveryAddress4": "Delivery",
+        "DeliveryAddress1": Address1,
+        "DeliveryAddress2": Address2,
+        "DeliveryAddress3": Address3,
+        "DeliveryAddress4":Address4,
         "DeliveryAddress5": "Delivery",
         "DeliveryCity": "kuching",
         "DeliveryPostCode": "94300",
