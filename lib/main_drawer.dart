@@ -290,10 +290,17 @@ class _LoginPageState extends State<LoginPage> {
     var data = json.decode(response.body);
     if(data == "Success"){
       var foo = await FlutterSession().set('GUID',email.text);
-
       Navigator.push(context, MaterialPageRoute(builder: (context)=> UserProfile()));
     }else{
-      print("username incorrect");
+      Fluttertoast.showToast(
+          msg: "Incorrect username and password",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 5,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
     }
   }
 }
